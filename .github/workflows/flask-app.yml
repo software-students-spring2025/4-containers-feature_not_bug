@@ -7,6 +7,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: enter working directory
+        run: cd web-app
+
       - name: Set up QEMU 
         uses: docker/setup-qemu-action@v3
 
@@ -22,6 +26,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: enter working directory
+        run: cd web-app
+        
       - name: Install Python, pipenv and Pipfile packages
         uses: kojoru/prepare-pipenv@v1
         with:
