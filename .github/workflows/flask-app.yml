@@ -20,7 +20,7 @@ jobs:
           pipenv lock
       - name: Install dependencies
         run: |
-          pipenv install 
+          pipenv install pytest pytest-flask
       - name: Test with pytest
         run: |
           pipenv run python -m pytest
