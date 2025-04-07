@@ -8,15 +8,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: enter working directory
-        run: cd web-app
-
       - name: Install Python, pipenv and Pipfile packages
         uses: kojoru/prepare-pipenv@v1
         with:
           python-version: "3.11"
+          working-directory: ./web-app
+
       - name: Regenerate lock file
         run: |
+          cd web-app
           pipenv lock
       - name: Install dependencies
         run: |
