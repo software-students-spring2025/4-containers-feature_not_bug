@@ -11,6 +11,7 @@ flask_session = "*"
 pymongo = "*"
 bson = "*"
 dotenv = "*"
+certifi = "*"
 
 [dev-packages]
 pytest = "*"
