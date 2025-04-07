@@ -1,0 +1,47 @@
+name: Build and test Flask webapp
+
+on: 
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-docker-container:
+    name: build docker image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up QEMU 
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buidlx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build flask docker image
+        run: |
+          docker build . -t web-app-4-containers-feature_not_bug
+
+  build-pipenv:
+    name: build and test with pipenv
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Python, pipenv and Pipfile packages
+        uses: kojoru/prepare-pipenv@v1
+        with:
+          python-version: "3.11"
+      - name: Regenerate lock file
+        run: |
+          pipenv lock
+      - name: Install dependencies
+        run: |
+          pipenv install 
+      - name: Test with pytest
+        run: |
+          pipenv run python -m pytest
+    
+
+      
