@@ -1,1 +1,41 @@
+version: '3.8'
 
+services:
+  ml-client:
+    build: 
+      context: ./machine-learning-client
+      dockerfile: Dockerfile
+    container_name: ml-client-4-containers-feature_not_bug
+    restart: always
+    networks:
+      - app_network
+    volumes:
+      - ./machine-learning-client:/app
+      - shared_uploads:/app/uploads
+    env_file:
+      - .env
+
+  web-app:
+    build: 
+      context: ./web-app
+      dockerfile: Dockerfile
+    container_name: web-app-4-containers-feature_not_bug
+    restart: always
+    ports:
+      - "5000:5000"
+    depends_on:
+      - ml-client
+    networks:
+      - app_network
+    volumes:
+      - ./web-app:/app
+      - shared_uploads:/app/static/uploads
+    env_file:
+      - .env
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  shared_uploads:
