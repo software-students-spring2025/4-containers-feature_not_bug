@@ -1,1 +1,66 @@
+version: '3.8'
 
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb-4-containers-feature_not_bug
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - app_network
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_DATABASE=dutch_pay
+
+  ml-client:
+    build: 
+      context: ./machine-learning-client
+      dockerfile: Dockerfile
+    container_name: ml-client-4-containers-feature_not_bug
+    restart: always
+    depends_on:
+      - mongodb
+    networks:
+      - app_network
+    volumes:
+      - ./machine-learning-client:/app
+      - shared_uploads:/app/uploads
+    environment:
+      - MONGO_URI=mongodb+srv://tm3995:FDNrd0MwV8C7NrXJ@dutchpayapp.rrkhlrg.mongodb.net/dutch_pay?retryWrites=true&w=majority&appName=DutchPayApp
+      - MONGO_DB=dutch_pay
+      - MONGO_COLLECTION=receipts
+
+  web-app:
+    build: 
+      context: ./web-app
+      dockerfile: Dockerfile
+    container_name: web-app-4-containers-feature_not_bug
+    restart: always
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+      - ml-client
+    networks:
+      - app_network
+    volumes:
+      - ./web-app:/app
+      - shared_uploads:/app/static/uploads
+    environment:
+      - MONGO_URI=mongodb+srv://tm3995:FDNrd0MwV8C7NrXJ@dutchpayapp.rrkhlrg.mongodb.net/dutch_pay?retryWrites=true&w=majority&appName=DutchPayApp
+      - MONGO_DB=dutch_pay
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+  shared_uploads:
