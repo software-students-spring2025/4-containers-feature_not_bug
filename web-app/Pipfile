@@ -9,7 +9,6 @@ black = "*"
 flask = "*"
 flask_session = "*"
 pymongo = "*"
-bson = "*"
 dotenv = "*"
 certifi = "*"
 
