@@ -1,4 +1,4 @@
-"""import modules for flask app"""
+"""Flask application for GoDutch - Receipt Splitter"""
 
 # import datetime
 import os
