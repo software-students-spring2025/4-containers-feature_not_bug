@@ -5,6 +5,9 @@ jobs:
   build-pipenv:
     name: build and test with pipenv
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./web-app
     steps:
       - uses: actions/checkout@v4
 
@@ -12,11 +15,10 @@ jobs:
         uses: kojoru/prepare-pipenv@v1
         with:
           python-version: "3.11"
-          working-directory: ./web-app
+          #working-directory: ./web-app
 
       - name: Regenerate lock file
         run: |
-          cd web-app
           pipenv lock
       - name: Install dependencies
         run: |
