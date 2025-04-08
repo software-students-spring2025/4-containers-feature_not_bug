@@ -1,19 +1,36 @@
 version: '3.8'
 
 services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb-4-containers-feature_not_bug
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - app_network
+    env_file:
+      - ./mongodb/.env
+
   ml-client:
     build: 
       context: ./machine-learning-client
       dockerfile: Dockerfile
     container_name: ml-client-4-containers-feature_not_bug
     restart: always
+    depends_on:
+      - mongodb
     networks:
       - app_network
     volumes:
       - ./machine-learning-client:/app
       - shared_uploads:/app/uploads
     env_file:
-      - .env
+      - ./machine-learning-client/.env
+      - MONGO_COLLECTION=receipts
 
   web-app:
     build: 
@@ -24,6 +41,7 @@ services:
     ports:
       - "5000:5000"
     depends_on:
+      - mongodb
       - ml-client
     networks:
       - app_network
@@ -31,11 +49,12 @@ services:
       - ./web-app:/app
       - shared_uploads:/app/static/uploads
     env_file:
-      - .env
+      - ./web-app/.env
 
 networks:
   app_network:
     driver: bridge
 
 volumes:
+  mongodb_data:
   shared_uploads:
