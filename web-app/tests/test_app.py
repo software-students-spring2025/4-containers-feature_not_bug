@@ -15,8 +15,8 @@ def client():
         yield testing_client
 
 
-def test_index_route(testing_client):
+def test_index_route(client):
     """Request the path '/' and ensure a 200 code response"""
-    response = testing_client.get("/")
+    response = client.get("/")
 
     assert response.status_code == 200
