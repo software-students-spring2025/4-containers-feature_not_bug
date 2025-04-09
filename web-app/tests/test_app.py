@@ -5,7 +5,7 @@ from app import app_setup  # Flask instance of the API
 
 
 @pytest.fixture
-def client():
+def client_setup():
     """
     Create and yield Flask app
     """
