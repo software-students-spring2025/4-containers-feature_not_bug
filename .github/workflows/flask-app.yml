@@ -24,6 +24,9 @@ jobs:
         run: |
           pipenv install pytest pytest-flask
       - name: Test with pytest
+        env: 
+          MONGO_DBNAME: ${{ secrets.MONGO_DBNAME }}
+          MONGO_URI: ${{ secrets.MONGO_URI }}
         run: |
           pipenv run python -m pytest
     

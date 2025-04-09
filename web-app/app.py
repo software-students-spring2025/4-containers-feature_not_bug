@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 # load environment variables
 load_dotenv()
 
+
 def app_setup():
 
     # connect MongoDB
@@ -25,7 +26,6 @@ def app_setup():
     myDb = client[Mongo_DBNAME]
 
     app = Flask(__name__, static_folder="assets")
-
 
     @app.route("/", methods=("GET", "POST"))
     def show_dashboard():
@@ -41,7 +41,8 @@ def app_setup():
 
         return render_template("index.html", data=data)  # render home page template
 
-    return app 
+    return app
+
 
 app = app_setup()
 
