@@ -4,8 +4,8 @@ import pytest
 from app import app_setup  # Flask instance of the API
 
 
-@pytest.fixture
-def client():
+@pytest.fixture(name="client")
+def fixture_client():
     """
     Create and yield Flask app
     """
