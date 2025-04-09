@@ -1,9 +1,9 @@
-name: Build and test Flask webapp
+name: Build and test Flask web app
 on: [push, pull_request]
 
 jobs:
-  build-pipenv:
-    name: build and test with pipenv
+  build-web-app:
+    name: build and test web app with pipenv
     runs-on: ubuntu-latest
     defaults:
       run:
