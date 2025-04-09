@@ -9,12 +9,14 @@ black = "*"
 flask = "*"
 flask_session = "*"
 pymongo = "*"
-bson = "*"
 dotenv = "*"
 certifi = "*"
+pytest = "*"
+pytest-flask = "*"
 
 [dev-packages]
 pytest = "*"
+pytest-flask = "*"
 
 [requires]
 python_version = "3"

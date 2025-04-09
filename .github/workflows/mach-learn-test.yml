@@ -1,0 +1,26 @@
+name: Build and test machine learning client
+on: [push, pull_request]
+
+jobs:
+  build-ml-client:
+    name: build and test ML client with pipenv
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./machine-learning-client
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Python, pipenv and Pipfile packages
+        uses: kojoru/prepare-pipenv@v1
+        with:
+          python-version: "3.11"
+          working-directory: ./machine-learning-client
+
+      - name: Sanity check 
+        run: |
+          echo "hello world"
+      
+    
+
+      
