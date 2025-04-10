@@ -18,12 +18,12 @@ load_dotenv()
 
 
 def app_setup():
-
+    """setup the app"""
     # connect MongoDB
     uri = os.getenv("MONGO_URI")
     client = MongoClient(uri, server_api=ServerApi("1"), tlsCAFile=certifi.where())
-    Mongo_DBNAME = os.getenv("MONGO_DBNAME")
-    myDb = client[Mongo_DBNAME]
+    dbname = os.getenv("MONGO_DBNAME")
+    my_db = client[dbname]
 
     app = Flask(__name__, static_folder="assets")
 
@@ -41,13 +41,25 @@ def app_setup():
 
         return render_template("index.html", data=data)  # render home page template
 
+    @app.route("/upload", methods=("GET", "POST"))
+    def upload():
+        """
+        Handle form submission when receipt is uploaded
+        """
+
+        data = request.form
+        if my_db:
+            pass
+
+        return render_template("upload.html", data=data)  # render home page template
+
     return app
 
 
-app = app_setup()
+my_app = app_setup()
 
 # keep alive
 if __name__ == "__main__":
-    app.run(
+    my_app.run(
         debug=True
     )  # running your server on development mode, setting debug to True
