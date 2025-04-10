@@ -3,7 +3,7 @@
 # import datetime
 import os
 import certifi
-from flask import Flask, render_template, request  # , url_for, redirect, session
+from flask import Flask, request  # , url_for, redirect, session
 
 # import pymongo
 # from bson.objectid import ObjectId
@@ -42,8 +42,6 @@ def app_setup():
         if my_db:
             pass
         # etc
-
-    
 
     return app
 
