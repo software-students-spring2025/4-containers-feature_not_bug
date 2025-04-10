@@ -4,7 +4,6 @@
 import os
 import certifi
 from flask import Flask, render_template, request  # , url_for, redirect, session
-# from flask_api import status
 
 # import pymongo
 # from bson.objectid import ObjectId
@@ -51,58 +50,76 @@ def app_setup():
         data = []
         print(request.form)
         # ensure a receipt photo was provided
-        if "capture-receipt"  in request.form:
+        if "capture-receipt" in request.form:
             data.append(("receipt", request.form["capture-receipt"]))
         elif "upload-receipt" in request.form:
             data.append(("receipt", request.form["upload-receipt"]))
-        else: 
+        else:
             return "Receipt image not found", 400
-        
+
         # ensure all proper parameters are included
         num = int(request.form["num-people"])
-        if "person-" + str(num) + "-name" not in request.form:
-            return "Number of people mismatched", 400
-        if "person-" + str(num+1) + "-name" in request.form:
+        if (
+            "person-" + str(num) + "-name" not in request.form
+            or "person-" + str(num + 1) + "-name" in request.form
+        ):
             return "Number of people mismatched", 400
         data.append(("num-people", request.form["num-people"]))
-        
+
         # check to ensure tip is a number (int or float) with up to 2 digits after the decimal
         try:
             s = request.form["tip"]
             tip = float(s)
         except ValueError:
-            return "Tip cannot be converted into a decimal and was likely entered wrong", 400
-        except: 
-            return "Error in entered tip", 400
+            return (
+                "Tip cannot be converted into a decimal and was likely entered wrong",
+                400,
+            )
         if "." in s:
-            if len(s.split(".")) != 2:
-                # the tip contains more than one decimal point, or contains no digits before or after it
-                return "Error in entered tip", 400
-            if len(s.split(".")[1]) > 2:
-                # the tip has more than two digits after the decimal point
+            if len(s.split(".")) != 2 or len(s.split(".")[1]) > 2:
+                # the tip contains more than one decimal point,
+                # or contains no digits before or after it,
+                # or has more than two digits after the decimal point
                 return "Error in entered tip", 400
         data.append(("tip", tip))
 
         # compile data to final form
         for i in range(0, num):
-            data.append((
-                "person-" + str(i+1) + "-name", request.form["person-" + str(i+1) + "-name"]
-            ))
-            data.append((
-                "person-" + str(i+1) + "-items", request.form["person-" + str(i+1) + "-desc"]
-            ))
-        
+            data.append(
+                (
+                    "person-" + str(i + 1) + "-name",
+                    request.form["person-" + str(i + 1) + "-name"],
+                )
+            )
+            data.append(
+                (
+                    "person-" + str(i + 1) + "-items",
+                    request.form["person-" + str(i + 1) + "-desc"],
+                )
+            )
+
         # send data
-        res = requests.post(
-            "http://127.0.0.1:4999/submit",
-            data=data
-        )
+        res = requests.post("http://127.0.0.1:4999/submit", data=data, timeout=60)
         if res.status_code == 200:
             print("received")
         else:
-            return "error in sending/receiving - ensure ML client is running properly on port 4999", 400
+            return (
+                "error in sending/receiving - "
+                "ensure ML client is running properly on port 4999",
+                400,
+            )
 
         return render_template("upload.html", data=data)  # render home page template
+
+    @app.route("/result", methods=("GET", "POST"))
+    def result():
+        """
+        Display results of data analysis
+        """
+        if my_db:
+            pass
+
+        return "This page not yet set up", 200
 
     return app
 

@@ -8,11 +8,10 @@ from flask import Flask, request  # , url_for, redirect, session
 # import pymongo
 # from bson.objectid import ObjectId
 # import database, filter
+# requests
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from dotenv import load_dotenv
-import requests
-#from flask_api import status
 
 # load environment variables
 load_dotenv()
@@ -39,30 +38,29 @@ def app_setup():
         """
         print("reached /submit")
 
-        data = {
-            "receipt": "",
-            "tip": 0,
-            "num-people": 0,
-            "people": []
-        }
+        data = {"receipt": "", "tip": 0, "num-people": 0, "people": []}
 
         # receive data from the POST request
         print(request.form)
         print(request.headers)
         print()
-        
+
         # Convert data to organized form
         data["receipt"] = request.form["receipt"]
         data["num-people"] = request.form["num-people"]
         data["tip"] = request.form["tip"]
         for i in range(0, int(data["num-people"])):
-            data["people"].append({
-                "name": request.form["person-" + str(i+1) + "-name"],
-                "items": request.form["person-" + str(i+1) + "-items"]
-            })
-        
+            data["people"].append(
+                {
+                    "name": request.form["person-" + str(i + 1) + "-name"],
+                    "items": request.form["person-" + str(i + 1) + "-items"],
+                }
+            )
+
         # process data .....
         print(data)
+        if my_db["receipts"].find({}):
+            pass
 
         # return confirmation of completion
         return "received", 200
@@ -76,6 +74,5 @@ my_app = app_setup()
 # keep alive
 if __name__ == "__main__":
     my_app.run(
-        debug=True, 
-        port=4999
+        debug=True, port=4999
     )  # running your server on development mode, setting debug to True
