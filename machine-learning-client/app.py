@@ -38,14 +38,34 @@ def app_setup():
         Submit a receipt and other data to the API endpoint
         """
         print("reached /submit")
+
+        data = {
+            "receipt": "",
+            "tip": 0,
+            "num-people": 0,
+            "people": []
+        }
+
         # receive data from the POST request
-        data = request.data
-        # manipulate data ...
-        if data:
-            pass
-        # store data in database
-        if my_db:
-            pass
+        print(request.form)
+        print(request.headers)
+        print()
+        
+        # Convert data to organized form
+        data["receipt"] = request.form["receipt"]
+        data["num-people"] = request.form["num-people"]
+        data["tip"] = request.form["tip"]
+        for i in range(0, int(data["num-people"])):
+            data["people"].append({
+                "name": request.form["person-" + str(i+1) + "-name"],
+                "items": request.form["person-" + str(i+1) + "-items"]
+            })
+        
+        # process data .....
+        print(data)
+
+        # return confirmation of completion
+        return "received", 200
         # etc
 
     return app

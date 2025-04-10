@@ -48,17 +48,13 @@ def app_setup():
         Handle form submission when receipt is uploaded
         """
 
-        data = {
-            "receipt": "",
-            "tip": 0,
-            "people": []
-        }
-
+        data = []
+        print(request.form)
         # ensure a receipt photo was provided
         if "capture-receipt"  in request.form:
-            data["receipt"] = request.form["capture-receipt"]
+            data.append(("receipt", request.form["capture-receipt"]))
         elif "upload-receipt" in request.form:
-            data["receipt"] = request.form["upload-receipt"]
+            data.append(("receipt", request.form["upload-receipt"]))
         else: 
             return "Receipt image not found", 400
         
@@ -68,6 +64,7 @@ def app_setup():
             return "Number of people mismatched", 400
         if "person-" + str(num+1) + "-name" in request.form:
             return "Number of people mismatched", 400
+        data.append(("num-people", request.form["num-people"]))
         
         # check to ensure tip is a number (int or float) with up to 2 digits after the decimal
         try:
@@ -84,14 +81,16 @@ def app_setup():
             if len(s.split(".")[1]) > 2:
                 # the tip has more than two digits after the decimal point
                 return "Error in entered tip", 400
-        data["tip"] = tip
+        data.append(("tip", tip))
 
         # compile data to final form
         for i in range(0, num):
-            data["people"].append({
-                "name": request.form["person-" + str(i+1) + "-name"],
-                "items": request.form["person-" + str(i+1) + "-desc"]
-            })
+            data.append((
+                "person-" + str(i+1) + "-name", request.form["person-" + str(i+1) + "-name"]
+            ))
+            data.append((
+                "person-" + str(i+1) + "-items", request.form["person-" + str(i+1) + "-desc"]
+            ))
         
         # send data
         res = requests.post(
@@ -101,7 +100,7 @@ def app_setup():
         if res.status_code == 200:
             print("received")
         else:
-            return "error in sending/receiving", 400
+            return "error in sending/receiving - ensure ML client is running properly on port 4999", 400
 
         return render_template("upload.html", data=data)  # render home page template
 
