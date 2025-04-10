@@ -22,8 +22,8 @@ def app_setup():
     # connect MongoDB
     uri = os.getenv("MONGO_URI")
     client = MongoClient(uri, server_api=ServerApi("1"), tlsCAFile=certifi.where())
-    Mongo_DBNAME = os.getenv("MONGO_DBNAME")
-    myDb = client[Mongo_DBNAME]
+    dbname = os.getenv("MONGO_DBNAME")
+    my_db = client[dbname]
 
     app = Flask(__name__, static_folder="assets")
 
@@ -40,6 +40,17 @@ def app_setup():
             data = {"filler": "filler"}
 
         return render_template("index.html", data=data)  # render home page template
+    
+    @app.route("/upload", methods=("GET", "POST"))
+    def upload():
+        """
+        Handle form submission when receipt is uploaded
+        """
+
+        data = request.form
+        print(data)
+
+        return render_template("upload.html", data=data)  # render home page template
 
     return app
 
