@@ -45,49 +45,51 @@
 
   <h1>GoDutch! - Split Your Receipt</h1>
 
-  <!-- Upload from files as form -->
-  <form id="receiptForm" onsubmit="handleFormSubmit(event)">
-    <div class="section">
-      <label for="receipt">Upload Receipt:</label><br>
-      <input type="file" id="receipt" name="receipt" accept="image/*" required />
-    </div>
+  <form method="post" action="/upload">
 
-    <div class="section">
-      <button type="submit">Upload Receipt</button>
-    </div>
-  </form>
+    <div id="step-1">
+      <h3>First: submit the receipt that needs splitting</h3>
+      <br>
+      
+      <input type="file" id="upload-receipt" name="upload-receipt" accept="image/*" />
 
-  <!-- Camera Takes Picture Upload as form-->
-  <form id="cameraForm" onsubmit="handleCameraSubmit(event)">
-    <div class="section">
+      <h3>-------- OR --------</h3>
+
       <button type="button" onclick="startCamera()">Start Camera</button>
       <video id="video" autoplay playsinline></video><br>
-      <button id="captureBtn" onclick="capturePhoto()" style="display: none;">Take Photo</button>
+      <button type="button" id="captureBtn" onclick="capturePhoto()" style="display: none;">Take Photo</button>
       <canvas id="canvas" style="display:none;"></canvas>
       <img id="preview" alt="Captured Receipt Preview" />
-      <button id="uploadBtn" style="display: none;" onclick="uploadCapturedPhoto()">Upload Photo</button>
+
+      <input type="hidden" id="manual-capture" name="capture-receipt" accept="image/*" />
+
+      <button id="next-btn" type="button" onclick="nextPage()">Next</button>
     </div>
+
+    <div style="display: none;" id="step-2">
+      
+      <h3>Next: How many people are splitting the bill?</h3>
+      <p>Add people to the tab and describe what they ordered. </p>
+
+      <label for="num-people">Number of people:</label>
+      <input id="num-people" name="num-people" type="number" required> 
+      <button type="button" onclick="generatePeople()">select</button>
+      
+      <br><br>
+      <div id="people">
+
+      </div>
+      <br><br>
+
+      <label for="tip" >How much was the tip?</label>
+      <input type="text" name="tip" required>
+
+      <input type="submit" value="Start splitting!">
+
+    </div>
+
   </form>
 
-  <!-- Displays Camera Picture Stuff -->
-  <div class="result" id="result"></div>
-
-  <!-- People Splitting Section -->
-  <div class="people-section" id="peopleSection">
-    <form id="peopleForm" onsubmit="handlePeopleSubmit(event)">
-      <label for="numPeople">How many people are splitting the bill?</label><br>
-      <input type="number" id="numPeople" name="numPeople" min="1" required />
-      <button type="submit">Next</button>
-    </form>
-  </div>
-
-  <!-- Description Section -->
-  <div class="description-section" id="descriptionSection">
-    <form id="descriptionForm" onsubmit="handleDescriptionSubmit(event)">
-      <div id="personDescriptions"></div>
-      <button type="submit">Submit Descriptions</button>
-    </form>
-  </div>
 
   <script>
     const video = document.getElementById('video');
@@ -121,119 +123,91 @@
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
       const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-      preview.src = URL.createObjectURL(blob);
+      const src = URL.createObjectURL(blob);
+      preview.src = src
       preview.style.display = 'block';
-      uploadBtn.style.display = 'inline-block';
-    }
 
-    function uploadCapturedPhoto() {
-      const formData = new FormData();
-      canvas.toBlob(blob => {
-        formData.append('receipt', blob, 'receipt.png');
+      console.log(src)
 
-        // MOCK DATA - NEED TO DELETE
-        const mockResponse = {
-          success: true,
-          items: [
-            { name: 'Chicken', price: 15.00 },
-            { name: 'Juice', price: 3.00 }
-          ]
-        };
-        displayResult(mockResponse);
-        showPeopleSection();
-      }, 'image/png');
-    }
-
-    function handleFormSubmit(event) {
-      event.preventDefault();
-      const fileInput = document.getElementById('receipt');
-      if (!fileInput.files.length) {
-        alert("Please choose a file first.");
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append('receipt', fileInput.files[0]);
-
-      // MOCK DATA - NEED TO DELETE
-      const mockResponse = {
-        success: true,
-        items: [
-          { name: 'Pizza', price: 15.00 },
-          { name: 'Soda', price: 3.00 }
-        ]
-      };
-
-      displayResult(mockResponse);
-      showPeopleSection();
-    }
-
-    function handleCameraSubmit(event) {
-      event.preventDefault();
-      capturePhoto();
-    }
-
-    function handlePeopleSubmit(event) {
-      event.preventDefault();
-      const numPeople = document.getElementById('numPeople').value;
-
-      if (!numPeople || numPeople <= 0) {
-        alert("Please enter a valid number of people.");
-        return;
-      }
-
-      // Showiing the description input section for each person
-      showDescriptionSection(numPeople);
-    }
-
-    function showPeopleSection() {
-      peopleSection.style.display = 'block';
-    }
-
-    function showDescriptionSection(numPeople) {
-      descriptionSection.style.display = 'block';
-      personDescriptions.innerHTML = ''; // Clearing any previous inputs
-
-      // Generating a text input for each person
-      for (let i = 1; i <= numPeople; i++) {
-        const label = document.createElement('label');
-        label.textContent = `Person ${i} Description:`;
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = `person${i}Description`;
-        input.placeholder = `Enter description for Person ${i}`;
-        personDescriptions.appendChild(label);
-        personDescriptions.appendChild(input);
-        personDescriptions.appendChild(document.createElement('br'));
-      }
-    }
-
-    function handleDescriptionSubmit(event) {
-      event.preventDefault();
-      const descriptions = [];
-      
-      const inputs = personDescriptions.getElementsByTagName('input');
-      for (let i = 0; i < inputs.length; i++) {
-        descriptions.push(inputs[i].value);
-      }
-
-      alert(`Descriptions submitted: ${descriptions.join(', ')}`);
-      // Now we send the descriptions to server/ML client
-    }
-
-    function displayResult(data) {
-      const resultDiv = document.getElementById('result');
-      if (data.success) {
-        let html = "<h3>Items:</h3><ul>";
-        data.items.forEach(item => {
-          html += `<li>${item.name} - $${item.price}</li>`;
-        });
-        html += "</ul>";
-        resultDiv.innerHTML = html;
+      // put it into input tag 
+      if (src.startsWith("data:")) {
+        document.getElementById('manual-capture').value = src;
       } else {
-        resultDiv.innerHTML = `<p style="color:red;">Error: ${data.error}</p>`;
+        // Otherwise, convert it to a data URL
+        const blob = await fetch(src).then(res => res.blob());
+        const reader = new FileReader();
+        
+        const base64Promise = new Promise(resolve => {
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(blob);
+        });
+
+        const dataUrl = await base64Promise;
+        document.getElementById('manual-capture').value = dataUrl;
       }
     }
+
+    function nextPage() {
+      console.log(document.getElementById("upload-receipt").value)
+      console.log(document.getElementById("manual-capture").value)
+      if (document.getElementById("upload-receipt").value != "" && document.getElementById("manual-capture").value != "") {
+        err = document.createElement("p")
+        err.innerText = "error: cannot upload two images - must choose between upload and manual capture"
+        err.style.color = 'red'
+        document.getElementById("step-1").appendChild(err)
+      }
+      else if (document.getElementById("upload-receipt").value == "" && document.getElementById("manual-capture").value == "") {
+        err = document.createElement("p")
+        err.innerText = "error: must provide an image of a receipt - either upload or take a picture"
+        err.style.color = 'red'
+        document.getElementById("step-1").appendChild(err)
+      }
+      else {
+        document.getElementById("step-1").style.display = "none"
+        document.getElementById("step-2").style.display = "inline-block"
+      }
+    }
+
+    function generatePeople() {
+
+      console.log('here')
+      const num = document.getElementById("num-people").value
+      const div = document.getElementById("people")
+
+      console.log(num)
+
+      // remove all input tags from previous attempts 
+      while (div.firstChild) {
+        div.removeChild(div.firstChild);
+      }
+
+      // add new input tags for each person 
+      let i = 0
+      while (i < num) {
+        console.log(i)
+        let name = document.createElement("input")
+        name.name = "person-" + (i+1).toString() + "-name"
+        name.type = "text"
+        name.required = true
+        name.placeholder = "person name"
+
+        div.appendChild(name)
+
+        let desc = document.createElement("input")
+        desc.name = "person-" + (i+1).toString() + "-desc"
+        desc.type = "text"
+        desc.required = true
+        desc.placeholder = "items ordered"
+
+        div.appendChild(desc)
+
+        div.appendChild(document.createElement("br"))
+
+        i++
+      }
+
+    }
+
   </script>
 </body>
 </html>
