@@ -11,7 +11,8 @@ from flask import Flask, request  # , url_for, redirect, session
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from dotenv import load_dotenv
-
+import requests
+#from flask_api import status
 
 # load environment variables
 load_dotenv()
@@ -27,12 +28,16 @@ def app_setup():
 
     app = Flask(__name__, static_folder="assets")
 
+    @app.route("/", methods=["GET"])
+    def show():
+        return "running", 200
+
     @app.route("/submit", methods=["POST"])
     def submit():
         """
         Submit a receipt and other data to the API endpoint
         """
-
+        print("reached /submit")
         # receive data from the POST request
         data = request.data
         # manipulate data ...
@@ -51,5 +56,6 @@ my_app = app_setup()
 # keep alive
 if __name__ == "__main__":
     my_app.run(
-        debug=True
+        debug=True, 
+        port=4999
     )  # running your server on development mode, setting debug to True
