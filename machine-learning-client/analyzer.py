@@ -3,6 +3,8 @@ This module processes receipt images, extracts text with pytesseract,
 and parses dish names with corresponding prices.
 """
 
+# pylint: disable=no-member
+
 import re
 import cv2
 import pytesseract
@@ -10,7 +12,9 @@ import pytesseract
 
 def process_image(raw_img):
     """Convert the input image to grayscale for better OCR performance."""
-    processed_img = cv2.cvtColor(raw_img, cv2.COLOR_BGR2GRAY)  # pylint: disable=no-member
+    processed_img = cv2.cvtColor(
+        raw_img, cv2.COLOR_BGR2GRAY
+    )  # pylint: disable=no-member
 
     return processed_img
 
