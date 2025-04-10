@@ -31,37 +31,76 @@
     .result {
       margin-top: 20px;
     }
+    .people-section {
+      margin-top: 20px;
+      display: none;
+    }
+    .description-section {
+      margin-top: 20px;
+      display: none;
+    }
   </style>
 </head>
 <body>
 
   <h1>GoDutch! - Split Your Receipt</h1>
 
-  <!-- Upload from files -->
-  <div class="section">
-    <label for="receipt">Upload Receipt:</label><br>
-    <input type="file" id="receipt" accept="image/*"/>
-    <button onclick="uploadReceipt()">Upload</button>
-  </div>
+  <!-- Upload from files as form -->
+  <form id="receiptForm" onsubmit="handleFormSubmit(event)">
+    <div class="section">
+      <label for="receipt">Upload Receipt:</label><br>
+      <input type="file" id="receipt" name="receipt" accept="image/*" required />
+    </div>
 
-  <!-- Camera Takes Picture Upload -->
-  <div class="section">
-    <button onclick="startCamera()">Start Camera</button>
-    <video id="video" autoplay playsinline></video><br>
-    <button id="captureBtn" onclick="capturePhoto()" style="display: none;">Take Photo</button>
-    <canvas id="canvas" style="display:none;"></canvas>
-    <img id="preview" alt="Captured Receipt Preview" />
-  </div>
+    <div class="section">
+      <button type="submit">Upload Receipt</button>
+    </div>
+  </form>
+
+  <!-- Camera Takes Picture Upload as form-->
+  <form id="cameraForm" onsubmit="handleCameraSubmit(event)">
+    <div class="section">
+      <button type="button" onclick="startCamera()">Start Camera</button>
+      <video id="video" autoplay playsinline></video><br>
+      <button id="captureBtn" onclick="capturePhoto()" style="display: none;">Take Photo</button>
+      <canvas id="canvas" style="display:none;"></canvas>
+      <img id="preview" alt="Captured Receipt Preview" />
+      <button id="uploadBtn" style="display: none;" onclick="uploadCapturedPhoto()">Upload Photo</button>
+    </div>
+  </form>
 
   <!-- Displays Camera Picture Stuff -->
   <div class="result" id="result"></div>
+
+  <!-- People Splitting Section -->
+  <div class="people-section" id="peopleSection">
+    <form id="peopleForm" onsubmit="handlePeopleSubmit(event)">
+      <label for="numPeople">How many people are splitting the bill?</label><br>
+      <input type="number" id="numPeople" name="numPeople" min="1" required />
+      <button type="submit">Next</button>
+    </form>
+  </div>
+
+  <!-- Description Section -->
+  <div class="description-section" id="descriptionSection">
+    <form id="descriptionForm" onsubmit="handleDescriptionSubmit(event)">
+      <div id="personDescriptions"></div>
+      <button type="submit">Submit Descriptions</button>
+    </form>
+  </div>
 
   <script>
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const preview = document.getElementById('preview');
     const captureBtn = document.getElementById('captureBtn');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const peopleSection = document.getElementById('peopleSection');
+    const descriptionSection = document.getElementById('descriptionSection');
+    const personDescriptions = document.getElementById('personDescriptions');
 
+     // JS Functions
+    
     async function startCamera() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -75,7 +114,6 @@
       }
     }
 
-   // JS Functions
     async function capturePhoto() {
       const context = canvas.getContext('2d');
       canvas.width = video.videoWidth;
@@ -85,25 +123,29 @@
       const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
       preview.src = URL.createObjectURL(blob);
       preview.style.display = 'block';
-
-      const formData = new FormData();
-      formData.append('receipt', blob, 'receipt.png');
-
-      try {
-        const response = await fetch('/upload_receipt', {
-          method: 'POST',
-          body: formData
-        });
-
-        const data = await response.json();
-        displayResult(data);
-      } catch (error) {
-        console.error('Upload error:', error);
-        alert('Upload failed.');
-      }
+      uploadBtn.style.display = 'inline-block';
     }
 
-    async function uploadReceipt() {
+    function uploadCapturedPhoto() {
+      const formData = new FormData();
+      canvas.toBlob(blob => {
+        formData.append('receipt', blob, 'receipt.png');
+
+        // MOCK DATA - NEED TO DELETE
+        const mockResponse = {
+          success: true,
+          items: [
+            { name: 'Chicken', price: 15.00 },
+            { name: 'Juice', price: 3.00 }
+          ]
+        };
+        displayResult(mockResponse);
+        showPeopleSection();
+      }, 'image/png');
+    }
+
+    function handleFormSubmit(event) {
+      event.preventDefault();
       const fileInput = document.getElementById('receipt');
       if (!fileInput.files.length) {
         alert("Please choose a file first.");
@@ -113,21 +155,72 @@
       const formData = new FormData();
       formData.append('receipt', fileInput.files[0]);
 
-      try {
-        const response = await fetch('/upload_receipt', {
-          method: 'POST',
-          body: formData
-        });
+      // MOCK DATA - NEED TO DELETE
+      const mockResponse = {
+        success: true,
+        items: [
+          { name: 'Pizza', price: 15.00 },
+          { name: 'Soda', price: 3.00 }
+        ]
+      };
 
-        const data = await response.json();
-        displayResult(data);
-      } catch (error) {
-        console.error('Upload error:', error);
-        alert('Upload failed.');
+      displayResult(mockResponse);
+      showPeopleSection();
+    }
+
+    function handleCameraSubmit(event) {
+      event.preventDefault();
+      capturePhoto();
+    }
+
+    function handlePeopleSubmit(event) {
+      event.preventDefault();
+      const numPeople = document.getElementById('numPeople').value;
+
+      if (!numPeople || numPeople <= 0) {
+        alert("Please enter a valid number of people.");
+        return;
+      }
+
+      // Showiing the description input section for each person
+      showDescriptionSection(numPeople);
+    }
+
+    function showPeopleSection() {
+      peopleSection.style.display = 'block';
+    }
+
+    function showDescriptionSection(numPeople) {
+      descriptionSection.style.display = 'block';
+      personDescriptions.innerHTML = ''; // Clearing any previous inputs
+
+      // Generating a text input for each person
+      for (let i = 1; i <= numPeople; i++) {
+        const label = document.createElement('label');
+        label.textContent = `Person ${i} Description:`;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = `person${i}Description`;
+        input.placeholder = `Enter description for Person ${i}`;
+        personDescriptions.appendChild(label);
+        personDescriptions.appendChild(input);
+        personDescriptions.appendChild(document.createElement('br'));
       }
     }
 
-    // Temporary Placeholder To Display The Data After Reciept Parsing
+    function handleDescriptionSubmit(event) {
+      event.preventDefault();
+      const descriptions = [];
+      
+      const inputs = personDescriptions.getElementsByTagName('input');
+      for (let i = 0; i < inputs.length; i++) {
+        descriptions.push(inputs[i].value);
+      }
+
+      alert(`Descriptions submitted: ${descriptions.join(', ')}`);
+      // Now we send the descriptions to server/ML client
+    }
+
     function displayResult(data) {
       const resultDiv = document.getElementById('result');
       if (data.success) {
@@ -144,4 +237,3 @@
   </script>
 </body>
 </html>
-
