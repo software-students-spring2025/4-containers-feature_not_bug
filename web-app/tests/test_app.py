@@ -21,8 +21,8 @@ def test_index_route(client):
 
     assert response.status_code == 200
 
+
 def test_index_contains_text(client):
     """Ensure that the page contains expected text"""
     response = client.get("/")
     assert b"GoDutch" in response.data
-    
