@@ -16,11 +16,10 @@ jobs:
         with:
           python-version: "3.11"
           working-directory: ./machine-learning-client
-
-      - name: Sanity check 
+      - name: Install dependencies
         run: |
-          echo "hello world"
-      
-    
+          pipenv install pytest pytest-flask
 
-      
+      - name: Test with pytest
+        run: |
+          pipenv run python -m pytest
