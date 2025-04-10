@@ -16,6 +16,7 @@ pylint = "*"
 black = "*"
 pytesseract = "*"
 opencv-python = "*"
+requests = "*"
 
 [dev-packages]
 pytest = "*"
