@@ -4,16 +4,22 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+coverage = "*"
+flask = "*"
+flask_session = "*"
+pymongo = "*"
+dotenv = "*"
+certifi = "*"
+pytest = "*"
+pytest-flask = "*"
 pylint = "*"
 black = "*"
-pytest = "*"
-coverage = "*"
-pymongo = "*"
-flask = "*"
 pytesseract = "*"
 opencv-python = "*"
 
 [dev-packages]
+pytest = "*"
+pytest-flask = "*"
 
 [requires]
-python_version = "3.10"
+python_version = "3"
