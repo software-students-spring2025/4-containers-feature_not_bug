@@ -4,8 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pylint = "*"
-black = "*"
 flask = "*"
 flask_session = "*"
 pymongo = "*"
@@ -13,6 +11,8 @@ dotenv = "*"
 certifi = "*"
 pytest = "*"
 pytest-flask = "*"
+pylint = "*"
+black = "*"
 
 [dev-packages]
 pytest = "*"
