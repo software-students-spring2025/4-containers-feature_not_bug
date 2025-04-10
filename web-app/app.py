@@ -4,6 +4,7 @@
 import os
 import certifi
 from flask import Flask, render_template, request  # , url_for, redirect, session
+from flask_api import status
 
 # import pymongo
 # from bson.objectid import ObjectId
@@ -11,7 +12,7 @@ from flask import Flask, render_template, request  # , url_for, redirect, sessio
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from dotenv import load_dotenv
-
+import requests
 
 # load environment variables
 load_dotenv()
@@ -47,9 +48,60 @@ def app_setup():
         Handle form submission when receipt is uploaded
         """
 
-        data = request.form
-        if my_db:
-            pass
+        data = {
+            "receipt": "",
+            "tip": 0,
+            "people": []
+        }
+
+        # ensure a receipt photo was provided
+        if request.form["capture-receipt"]:
+            data["receipt"] = request.form["capture-receipt"]
+        elif request.form["upload-receipt"]:
+            data["receipt"] = request.form["upload-receipt"]
+        else: 
+            return "Receipt image not found", status.HTTP_400_BAD_REQUEST
+        
+        # ensure all proper parameters are included
+        num = request.form["num-people"]
+        if not request.form["person-" + str(num) + "-name"]:
+            return "Number of people mismatched", status.HTTP_400_BAD_REQUEST
+        if request.form["person-" + str(num+1) + "-name"]:
+            return "Number of people mismatched", status.HTTP_400_BAD_REQUEST
+        
+        # check to ensure tip is a number (int or float) with up to 2 digits after the decimal
+        s = request.form["tip"]
+        try:
+            tip = float(s)
+        except ValueError:
+            return "Tip cannot be converted into a decimal and was likely entered wrong", status.HTTP_400_BAD_REQUEST
+        except: 
+            return "Error in entered tip", status.HTTP_400_BAD_REQUEST
+        if "." in s:
+            if len(s.split(".")) != 2:
+                # the tip contains more than one decimal point, or contains no digits before or after it
+                return "Error in entered tip", status.HTTP_400_BAD_REQUEST
+            if len(s.split(".")[1]) > 2:
+                # the tip has more than two digits after the decimal point
+                return "Error in entered tip", status.HTTP_400_BAD_REQUEST
+        data["tip"] = tip
+
+        # compile data to final form
+        for i in range(0, num):
+            data["people"].append({
+                "name": request.form["person-" + str(i+1) + "-name"],
+                "items": request.form["person-" + str(i+1) + "-desc"]
+            })
+        
+        # send data
+        res = requests.post(
+            "http://127.0.0.1:4999/submit",
+            data=data
+        )
+        if res.status_code == 200:
+            print("received")
+        else:
+            return "error in sending/receiving", status.HTTP_400_BAD_REQUEST
 
         return render_template("upload.html", data=data)  # render home page template
 

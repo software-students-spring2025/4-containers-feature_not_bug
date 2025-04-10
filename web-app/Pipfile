@@ -13,6 +13,8 @@ pytest = "*"
 pytest-flask = "*"
 pylint = "*"
 black = "*"
+flask_api = "*"
+requests = "*"
 
 [dev-packages]
 pytest = "*"
