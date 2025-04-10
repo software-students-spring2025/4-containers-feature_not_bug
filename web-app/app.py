@@ -18,7 +18,7 @@ load_dotenv()
 
 
 def app_setup():
-
+    """setup the app"""
     # connect MongoDB
     uri = os.getenv("MONGO_URI")
     client = MongoClient(uri, server_api=ServerApi("1"), tlsCAFile=certifi.where())
@@ -40,7 +40,7 @@ def app_setup():
             data = {"filler": "filler"}
 
         return render_template("index.html", data=data)  # render home page template
-    
+
     @app.route("/upload", methods=("GET", "POST"))
     def upload():
         """
@@ -48,17 +48,18 @@ def app_setup():
         """
 
         data = request.form
-        print(data)
+        if my_db:
+            pass
 
         return render_template("upload.html", data=data)  # render home page template
 
     return app
 
 
-app = app_setup()
+my_app = app_setup()
 
 # keep alive
 if __name__ == "__main__":
-    app.run(
+    my_app.run(
         debug=True
     )  # running your server on development mode, setting debug to True
