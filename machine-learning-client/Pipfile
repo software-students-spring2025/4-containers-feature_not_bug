@@ -16,8 +16,6 @@ pylint = "*"
 black = "*"
 pytesseract = "*"
 opencv-python = "*"
-flask_api = "*"
-flask-api = "*"
 requests = "*"
 
 [dev-packages]
