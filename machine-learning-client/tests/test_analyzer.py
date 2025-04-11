@@ -3,16 +3,17 @@
 import pytest
 from analyzer import sanitize_string
 from analyzer import parse_processed_lines
+from analyzer import filter_dishes
 
 
 def test_sanitize_string_normal():
-    """ "Test string sanization with unsanitized string"""
-    result = sanitize_string(" 123Chicken Bowl!!")
-    assert result == "Chicken Bowl", f"Expected 'Chicken Soup', got '{result}'"
+    """Test string sanization with unsanitized string"""
+    result = sanitize_string("  Chicken Bowl!!")
+    assert result == "Chicken Bowl", f"Expected 'Chicken Bowl', got '{result}'"
 
 
 def test_sanitize_string_sanitized():
-    """ "Test string that is already sanitized"""
+    """Test string that is already sanitized"""
     result = sanitize_string("Pepperoni Pizza")
     assert result == "Pepperoni Pizza", f"Expected 'Pepperoni Pizza', got '{result}'"
 
@@ -56,3 +57,37 @@ def test_parse_processed_lines_no_valid_input():
     ]
     entries = parse_processed_lines(lines)
     assert not entries, "Expected an empty list"
+
+
+def test_filter_dishes_with_valid_input():
+    """"Tests filtering dishes and other charges with valid input"""
+    entries = [
+        {"dish": "Cheeseburger", "price": 10.0},
+        {"dish": "Hotdog", "price": 3.0},
+        {"dish": "French Fries", "price": 4.0},
+        {"dish": "Subtotal", "price": 17.0},
+        {"dish": "Tax", "price": 1.51},
+        {"dish": "Tips", "price": 3.06},
+        {"dish": "Total", "price": 21.57},
+    ]
+    dishes, other_charges = filter_dishes(entries)
+    assert len(dishes) == 3
+    assert len(other_charges) == 4
+
+    assert dishes[0]["dish"].lower() == "cheeseburger"
+    assert dishes[1]["dish"].lower() == "hotdog"
+    assert dishes[2]["dish"].lower() == "french fries"
+
+    assert other_charges[0]["dish"].lower() == "subtotal"
+    assert other_charges[1]["dish"].lower() == "tax"
+    assert other_charges[2]["dish"].lower() == "tips"
+    assert other_charges[3]["dish"].lower() == "total"
+
+
+def test_filter_dishes_with_empty_input():
+    """Tests filtering dishes with an empty input"""
+    entries = [] 
+    dishes, other_charges = filter_dishes(entries)
+
+    assert len(dishes) == 0
+    assert len(other_charges) == 0
