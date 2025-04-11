@@ -60,7 +60,7 @@ def test_parse_processed_lines_no_valid_input():
 
 
 def test_filter_dishes_with_valid_input():
-    """"Tests filtering dishes and other charges with valid input"""
+    """ "Tests filtering dishes and other charges with valid input"""
     entries = [
         {"dish": "Cheeseburger", "price": 10.0},
         {"dish": "Hotdog", "price": 3.0},
@@ -86,7 +86,7 @@ def test_filter_dishes_with_valid_input():
 
 def test_filter_dishes_with_empty_input():
     """Tests filtering dishes with an empty input"""
-    entries = [] 
+    entries = []
     dishes, other_charges = filter_dishes(entries)
 
     assert len(dishes) == 0

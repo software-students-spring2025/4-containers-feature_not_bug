@@ -50,23 +50,17 @@ def filter_dishes(entries):
         "fee",
         "total",
     ]
-    filtered_dishes = []
-    other_charges = []
+    dishes = []
+    charges = []
 
     for item in entries:
         dish_name = item["dish"].strip().lower()
         if not any(keyword in dish_name for keyword in keywords):
-            filtered_dishes.append(item)
+            dishes.append(item)
         else:
-            other_charges.append(item)
+            charges.append(item)
 
-    return filtered_dishes, other_charges
-
-
-''''
-def calculate_charge_per_person():
-    """Calculate the charge for each member of the party according to dish allocation, tax, tips, and other charges"""
-'''
+    return dishes, charges
 
 
 def parse_processed_lines(lines):
