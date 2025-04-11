@@ -29,12 +29,15 @@ def app_setup():
 
     @app.route("/", methods=["GET"])
     def show():
+        """
+        Sanity check to check in browser if endpoint is functional
+        """
         return "running", 200
 
     @app.route("/submit", methods=["POST"])
     def submit():
         """
-        Submit a receipt and other data to the API endpoint
+        Receive data from the web-app and run analysis
         """
         print("reached /submit")
 
