@@ -2,7 +2,6 @@
 
 import pytest
 from app import app_setup  # Flask instance of the API
-from requests.exceptions import ConnectionError
 
 
 @pytest.fixture(name="client")
