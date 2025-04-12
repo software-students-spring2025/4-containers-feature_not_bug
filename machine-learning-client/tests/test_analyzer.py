@@ -4,6 +4,8 @@ import pytest
 from analyzer import sanitize_string
 from analyzer import parse_processed_lines
 from analyzer import filter_dishes
+from analyzer import normalize_dictionary_list
+from analyzer import calculate_charge_per_person
 
 
 def test_sanitize_string_normal():
@@ -60,7 +62,7 @@ def test_parse_processed_lines_no_valid_input():
 
 
 def test_filter_dishes_with_valid_input():
-    """ "Tests filtering dishes and other charges with valid input"""
+    """ "Test filtering dishes and other charges with valid input"""
     entries = [
         {"dish": "Cheeseburger", "price": 10.0},
         {"dish": "Hotdog", "price": 3.0},
@@ -85,9 +87,174 @@ def test_filter_dishes_with_valid_input():
 
 
 def test_filter_dishes_with_empty_input():
-    """Tests filtering dishes with an empty input"""
+    """Test filtering dishes with an empty input"""
     entries = []
     dishes, other_charges = filter_dishes(entries)
 
     assert len(dishes) == 0
     assert len(other_charges) == 0
+
+
+def test_normalize_empty_list():
+    """Test that an empty list returns an empty dictionary."""
+    assert not normalize_dictionary_list([])
+
+
+def test_normalize_single_entry():
+    """Test that a single dictionary entry in the list returns a dictionary"""
+    dictionary_list = [{"dish": "Salmon Lover", "price": 18.0}]
+    assert normalize_dictionary_list(dictionary_list) == {"salmon lover": 18.0}
+
+
+def test_normalize_multiple_entries():
+    """Test that a list of multiple dictionaries returns a single dictionary"""
+    dictionary_list = [
+        {"dish": "Chicken Bowl", "price": 11.65},
+        {"dish": "Quesadilla", "price": 8.0},
+        {"dish": "Guacamole", "price": 3.0},
+    ]
+    assert normalize_dictionary_list(dictionary_list) == {
+        "chicken bowl": 11.65,
+        "quesadilla": 8.0,
+        "guacamole": 3.0,
+    }
+
+
+def test_normalize_whitespace_and_case():
+    """Test that extra whitespace and casing are normalized correctly"""
+    dictionary_list = [
+        {"dish": "  Chicken over rice  ", "price": 7.0},
+        {"dish": "LAMB KEBAB ", "price": 5.0},
+        {"dish": "CoCa-CoLa", "price": 2.0},
+    ]
+    assert normalize_dictionary_list(dictionary_list) == {
+        "chicken over rice": 7.0,
+        "lamb kebab": 5.0,
+        "coca-cola": 2.0,
+    }
+
+
+def test_normalize_invalid_input():
+    """Test normalize function with invalid input"""
+    with pytest.raises(TypeError):
+        normalize_dictionary_list(123)
+
+
+def test_calculate_charge_valid_input():
+    """Test calculate charge per person with valid input"""
+    user_input = {
+        "tip": 6.32,
+        "people": [
+            {"name": "Alice", "items": "BigMac, Large Coke"},
+            {"name": "Bob", "items": "Chicken McNuggets, Barbecue Sauce, Small Sprite"},
+            {"name": "Charlie", "items": "McChicken, Double Cheeseburger"},
+        ],
+    }
+    filtered_dishes = [
+        {"dish": "BigMac", "price": 5.0},
+        {"dish": "Large Coke", "price": 3.0},
+        {"dish": "Chicken McNuggets", "price": 5.0},
+        {"dish": "Barbecue Sauce", "price": 2.0},
+        {"dish": "Small Sprite", "price": 1.5},
+        {"dish": "McChicken", "price": 3.0},
+        {"dish": "Double Cheeseburger", "price": 5.0},
+    ]
+    other_charges = [
+        {"dish": "Subtotal", "price": 24.5},
+        {"dish": "Tax", "price": 2.17},
+        {"dish": "Total", "price": 32.99},
+    ]
+    expected = {"Alice": 10.77, "Bob": 11.44, "Charlie": 10.77}
+
+    result = calculate_charge_per_person(user_input, filtered_dishes, other_charges)
+
+    for name, expected_value in expected.items():
+        assert result[name] == pytest.approx(expected_value, rel=1e-2)
+
+
+# pylint: disable=no-value-for-parameter
+def test_calculate_charge_invalid_input():
+    """ "Test calculate charge with invalid input"""
+    with pytest.raises(TypeError):
+        calculate_charge_per_person(True, {}, 123)
+
+    with pytest.raises(TypeError):
+        calculate_charge_per_person({}, [])
+
+
+def test_calculate_charge_missing_tip():
+    """Test calculate charge when no tip is provided"""
+    user_input = {
+        "people": [
+            {"name": "Alice", "items": "Shoyu Ramen"},
+            {"name": "Bob", "items": "Green Tea"},
+        ]
+    }
+    filtered_dishes = [
+        {"dish": "Shoyu Ramen", "price": 12.0},
+        {"dish": "Green Tea", "price": 3.0},
+    ]
+
+    other_charges = [
+        {"dish": "Subtotal", "price": 15.0},
+        {"dish": "Tax", "price": 1.32},
+        {"dish": "Total", "price": 16.32},
+    ]
+
+    expected = {"Alice": 13.06, "Bob": 3.26}
+    result = calculate_charge_per_person(user_input, filtered_dishes, other_charges)
+
+    for name, expected_value in expected.items():
+        assert result[name] == pytest.approx(expected_value, rel=1e-2)
+
+
+def test_calculate_charge_no_people():
+    """Test calculate charge with an empty list of people"""
+    user_input = {"tip": 5.0, "people": []}
+    filtered_dishes = [{"dish": "Pizza", "price": 35.0}]
+    other_charges = [{"dish": "Subtotal", "price": 40.0}]
+
+    result = calculate_charge_per_person(user_input, filtered_dishes, other_charges)
+    assert result == {}
+
+
+def test_calculate_charge_missing_dish():
+    """ "Test calculate charge when none of the dishes indicated by the user are in the receipt"""
+    user_input = {
+        "tip": 4.0,
+        "people": [
+            {"name": "Alice", "items": "Pizza"},
+            {"name": "Bob", "items": "Pasta"},
+        ],
+    }
+    # filtered_dishes does not include Pizza or Pasta.
+    filtered_dishes = [{"dish": "Baked Chicken", "price": 12.0}]
+    other_charges = [{"dish": "Subtotal", "price": 12.0}, {"dish": "Tax", "price": 1.0}]
+    expected = {"Alice": 0.0, "Bob": 0.0}
+    result = calculate_charge_per_person(user_input, filtered_dishes, other_charges)
+    for name, expected_value in expected.items():
+        assert result[name] == pytest.approx(expected_value, rel=1e-2)
+
+
+def test_calculate_charge_extra_dish():
+    """ "Test calculate charge when an extra dish is present in the receipt"""
+    user_input = {
+        "tip": 4.0,
+        "people": [
+            {"name": "Alice", "items": "Pizza"},
+            {"name": "Bob", "items": "Pasta"},
+        ],
+    }
+    # filtered_dishes does not include Pizza or Pasta.
+    filtered_dishes = [
+        {"dish": "Pizza", "price": 12.0},
+        {"dish": "Pasta", "price": 12.0},
+        {"dish": "Baked Chicken", "price": 12.0},
+        {"dish": "Baked Alaska", "price": 1000.0},
+    ]
+    other_charges = [{"dish": "Subtotal", "price": 24.0}, {"dish": "Tax", "price": 2.0}]
+    expected = {"Alice": 15.0, "Bob": 15.0}
+    result = calculate_charge_per_person(user_input, filtered_dishes, other_charges)
+
+    for name, expected_value in expected.items():
+        assert result[name] == expected_value
