@@ -50,9 +50,9 @@ def app_setup():
         data = []
         print(request.form)
         # ensure a receipt photo was provided
-        if "capture-receipt" in request.form:
+        if "capture-receipt" in request.form and request.form["capture-receipt"] != "":
             data.append(("receipt", request.form["capture-receipt"]))
-        elif "upload-receipt" in request.form:
+        elif "upload-receipt" in request.form and request.form["upload-receipt"] != "":
             data.append(("receipt", request.form["upload-receipt"]))
         else:
             return "Receipt image not found", 400
