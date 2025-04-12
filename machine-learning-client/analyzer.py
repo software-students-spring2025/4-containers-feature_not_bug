@@ -20,9 +20,9 @@ def process_image(raw_img):
 
 
 def sanitize_string(dish):
-    """ "Remove unnecessary characters from dish name"""
+    """Remove unnecessary characters from dish name"""
     index_start = 0
-    while not dish[index_start].isalpha():
+    while not dish[index_start].isalnum():
         index_start += 1
 
     index_end = -1
@@ -36,9 +36,35 @@ def sanitize_string(dish):
     return dish[index_start : index_end + 1]
 
 
-# Parse lines from text
+def filter_dishes(entries):
+    """Filter dishes from subtotal, tax, tips, grand total, and other charges"""
+    keywords = [
+        "subtotal",
+        "sub-total",
+        "tax",
+        "tip",
+        "tips",
+        "service",
+        "charge",
+        "card",
+        "fee",
+        "total",
+    ]
+    dishes = []
+    charges = []
+
+    for item in entries:
+        dish_name = item["dish"].strip().lower()
+        if not any(keyword in dish_name for keyword in keywords):
+            dishes.append(item)
+        else:
+            charges.append(item)
+
+    return dishes, charges
+
+
 def parse_processed_lines(lines):
-    """ "Separate and parse dishes and prices from lines"""
+    """Separate and parse dishes and prices from lines"""
     pattern = re.compile(r"([\d]+[,.][\d]{2})\s*$")
     entries = []
 
@@ -66,4 +92,9 @@ img = cv2.imread(r"test-receipt_2.jpg")  # pylint: disable=no-member
 processed_text = pytesseract.image_to_string(process_image(img))
 processed_lines = parse_processed_lines(processed_text.splitlines())
 
+filtered_dishes, other_charges = filter_dishes(processed_lines)
+
 print(processed_lines)
+print()
+print(filtered_dishes)
+print(other_charges)
