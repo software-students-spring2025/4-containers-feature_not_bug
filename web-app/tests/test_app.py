@@ -152,7 +152,6 @@ def test_correct_post(client):
     try: 
         response = client.post("/upload", data=data)
     except ConnectionError as e:
-        print(e)
         assert True
     else:
         assert False
