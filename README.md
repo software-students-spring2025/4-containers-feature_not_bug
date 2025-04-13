@@ -22,34 +22,57 @@ Before you begin, ensure you have the following installed on your system:
 - **pip** (Python package installer) - [Install pip](https://pip.pypa.io/en/stable/)
 - **Git** (for version control) - [Install Git](https://git-scm.com/)
 
-### Setting Up the Web App
+### How to Run this Project
 
-1. Clone the repository:
+1. Clone the repository and cd to the location where you have saved the repo :
 
  ```bash
-   git clone https://github.com/software-students-spring2025/4-containers-feature_not_bug.git 
+git clone https://github.com/software-students-spring2025/4-containers-feature_not_bug.git 
+cd path_to_your_repo_copy
  ```
-2.
-3.
-4. Create a .env file
+2. Run the Machine Learning Client:
 
-### Setting Up the Machine Learning Client
+```bash
+cd machine-learning-client
+pipenv install
+pipenv run python app.py
+```
+This starts the ML service on http://localhost:5001.
 
-### Seeting up the Database
+3. Run the Web App:
 
-### Running tests
+```bash
+cd web-app
+pipenv install
+pipenv run python app.py
+```
+This starts the frontend server on http://localhost:5000.
+
+4. Create a .env file inside the web-app directory (and machine-learning-client if needed). Here is an example:
+
+```dotenv
+MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/dbname
+MONGO_DBNAME="dutch_pay" 
+```
+
+### Running Tests
 To ensure everything is working as expected, you can run the tests for both parts of the application.
 
 **Web App Tests**
-In the web-app directory, run:
 
 ```bash
-pytest
+cd web-app
+pipenv run pytest
 ```
 
 **Machine Learning Client Tests**
-In the machine-learning-client directory, run:
 
 ``` bash
-pytest
+cd machine-learning-client
+pipenv run pytest
 ```
+
+### Additional Information
+
+- Be sure to run both servers at the same time to fully test functionality.
+- All secrets and credentials should live in .env files (not committed).
