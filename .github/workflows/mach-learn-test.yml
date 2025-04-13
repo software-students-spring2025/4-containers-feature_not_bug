@@ -16,14 +16,23 @@ jobs:
         with:
           python-version: "3.11"
           working-directory: ./machine-learning-client
+
+      - name: Regenerate lock file
+        run: |
+          pipenv lock
+
       - name: Install dependencies
         run: |
-          pipenv install -r requirements.txt
+          pipenv install pytest pytest-flask
+
       - name: Install Tesseract OCR
         run: |
           sudo apt-get update
           sudo apt-get install -y tesseract-ocr
 
       - name: Test with pytest
+        env:
+          MONGO_DBNAME: ${{ secrets.MONGO_DBNAME }}
+          MONGO_URI: ${{ secrets.MONGO_URI }}
         run: |
           pipenv run python -m pytest
