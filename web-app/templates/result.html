@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GoDutch - Split Results</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <style>
+    .results-container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: var(--light);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+    }
+
+    .receipt-summary {
+      display: flex;
+      margin-bottom: 30px;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .receipt-image {
+      width: 200px;
+      height: auto;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--light-gray);
+    }
+
+    .receipt-details {
+      flex: 1;
+    }
+
+    .person-card {
+      background-color: rgba(66, 122, 161, 0.05);
+      border-radius: var(--border-radius);
+      padding: 20px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--secondary);
+    }
+
+    .person-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .person-name {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin: 0;
+    }
+
+    .person-total {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      padding: 8px 15px;
+      background-color: var(--background);
+      border-radius: var(--border-radius);
+    }
+
+    .item-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--light-gray);
+    }
+
+    .item:last-child {
+      border-bottom: none;
+    }
+
+    .item-name {
+      flex: 1;
+    }
+
+    .item-price {
+      font-weight: 500;
+    }
+
+    .totals-summary {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: rgba(93, 162, 113, 0.1);
+      border-radius: var(--border-radius);
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .grand-total {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--success);
+      padding-top: 10px;
+      margin-top: 10px;
+      border-top: 2px solid var(--light-gray);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    .btn-share {
+      background-color: var(--secondary);
+    }
+
+    .btn-share:hover {
+      background-color: #3b6c90;
+    }
+
+    .receipt-details h2 {
+      margin-top: 0;
+      color: var(--primary);
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 40px;
+      color: var(--gray);
+    }
+
+    .tip-card {
+      background-color: rgba(66, 122, 161, 0.05);
+      border-radius: var(--border-radius);
+      padding: 15px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--success);
+    }
+
+    @media (max-width: 768px) {
+      .receipt-summary {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .receipt-image {
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .receipt-details {
+        text-align: center;
+      }
+
+      .person-header {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>GoDutch! - Split Results</h1>
+
+    {% if result_data %}
+    <div class="results-container">
+      <h2 style="text-align: center;">Individual Breakdown</h2>
+      
+      {% for person in result_data.people %}
+      <div class="person-card">
+        <div class="person-header">
+          <h3 class="person-name">{{ person.name }}</h3>
+          <div class="person-total">${{ person.total }}</div>
+        </div>
+        
+        <ul class="item-list">
+          {% for item in person.items %}
+          <li class="item">
+            <span class="item-name">{{ item.name }}</span>
+            <span class="item-price">${{ item.price }}</span>
+          </li>
+          {% endfor %}
+          
+          {% if person.tax > 0 %}
+          <li class="item">
+            <span class="item-name">Tax</span>
+            <span class="item-price">${{ person.tax }}</span>
+          </li>
+          {% endif %}
+          
+          {% if person.tip > 0 %}
+          <li class="item">
+            <span class="item-name">Tip</span>
+            <span class="item-price">${{ person.tip }}</span>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+      {% endfor %}
+
+      <div class="totals-summary">
+        <h3>Receipt Totals</h3>
+        <div class="total-row">
+          <span>Subtotal:</span>
+          <span>${{ result_data.subtotal }}</span>
+        </div>
+        <div class="total-row">
+          <span>Tax:</span>
+          <span>${{ result_data.tax }}</span>
+        </div>
+        <div class="total-row">
+          <span>Tip:</span>
+          <span>${{ result_data.tip }}</span>
+        </div>
+        <div class="total-row grand-total">
+          <span>Grand Total:</span>
+          <span>${{ result_data.total }}</span>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button onclick="window.location.href='/'">Start Over</button>
+      </div>
+    </div>
+    {% else %}
+    <div class="results-container no-results">
+      <h2>No results found</h2>
+      <p>We couldn't find any receipt splitting results. Please try submitting a receipt again.</p>
+      <button onclick="window.location.href='/'">Return to Home</button>
+    </div>
+    {% endif %}
+  </div>
+
+  <script>
+  </script>
+</body>
+</html>

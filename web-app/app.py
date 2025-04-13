@@ -45,10 +45,18 @@ def app_setup():
 
         data = []
         print(request.form)
+
         if (
             "capture-receipt" not in request.form
             and "upload-receipt" not in request.form
         ):
+            return "Receipt image not found", 400
+          
+        if "capture-receipt" in request.form and request.form["capture-receipt"] != "":
+            data.append(("receipt", request.form["capture-receipt"]))
+        elif "upload-receipt" in request.form and request.form["upload-receipt"] != "":
+            data.append(("receipt", request.form["upload-receipt"]))
+        else:
             return "Receipt image not found", 400
 
         if "capture-receipt" in request.form and request.form["capture-receipt"] != "":
