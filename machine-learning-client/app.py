@@ -26,12 +26,9 @@ def app_setup():
         data = {"receipt": "", "tip": 0, "num-people": 0, "people": []}
 
         # receive data from the POST request
-        print(request.form)
-        print(request.headers)
-        print()
-
         # Convert data to organized form
         data["receipt"] = request.form["receipt"]
+        #print(data)
         data["num-people"] = request.form["num-people"]
         data["tip"] = request.form["tip"]
         for i in range(0, int(data["num-people"])):
@@ -48,9 +45,10 @@ def app_setup():
 
         except Exception as e:  # pylint: disable=broad-exception-caught
             return (
-                e,
+                f"error processing the receipt in the ML client API: {str(e)}",
                 500,
             )
+        
 
     return app
 
