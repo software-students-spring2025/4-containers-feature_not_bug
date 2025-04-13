@@ -17,6 +17,7 @@ black = "*"
 pytesseract = "*"
 opencv-python = "*"
 requests = "*"
+mongomock = "*"
 
 [dev-packages]
 pytest = "*"

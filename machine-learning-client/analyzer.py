@@ -8,6 +8,8 @@ and parses dish names with corresponding prices.
 import re
 import cv2
 import pytesseract
+from db import store_receipt_text
+from db import store_charge_per_person
 
 
 def process_image(raw_img):
@@ -175,7 +177,5 @@ def process_data(user_input):
         user_input, filtered_dishes, other_charges
     )
 
-    print(charge_per_person)  # Temporary print to cover linting
-
-    # store receipt in DB
-    # store charge_per_person in DB
+    store_receipt_text(processed_text)
+    store_charge_per_person(charge_per_person)
