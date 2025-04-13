@@ -23,7 +23,7 @@ def patch_get_db(monkeypatch):
 
 def test_store_receipt_text():
     """Test storing the raw receipt text into DB"""
-    sample_receipt_text = "BigMac 5.0\nLarge Coke 3.0\nChicken McNuggets 5.0\nSub-total   13.0\nTAX   2.0\nTotal   15.0" #pylint: disable=line-too-long
+    sample_receipt_text = "BigMac 5.0\nLarge Coke 3.0\nChicken McNuggets 5.0\nSub-total   13.0\nTAX   2.0\nTotal   15.0"  # pylint: disable=line-too-long
 
     inserted_id = store_receipt_text(sample_receipt_text)
     assert inserted_id is not None
