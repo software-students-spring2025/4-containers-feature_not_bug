@@ -18,7 +18,7 @@ jobs:
           working-directory: ./machine-learning-client
       - name: Install dependencies
         run: |
-          pipenv install pytest pytest-flask
+          pipenv install -r requirements.txt
       - name: Install Tesseract OCR
         run: |
           sudo apt-get update
