@@ -133,7 +133,7 @@ def app_setup():
             return ("No results found", 404)
 
         # return the results HTML page
-        return render_template("result.html", result_data=result_data)
+        return render_template("result.html", data=result_data)
 
     return app
 

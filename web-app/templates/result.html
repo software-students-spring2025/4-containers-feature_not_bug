@@ -174,11 +174,11 @@
   <div class="container">
     <h1>GoDutch! - Split Results</h1>
 
-    {% if result_data %}
+    {% if data %}
     <div class="results-container">
       <h2 style="text-align: center;">Individual Breakdown</h2>
       
-      {% for person in result_data.people %}
+      {% for person in data.people %}
       <div class="person-card">
         <div class="person-header">
           <h3 class="person-name">{{ person.name }}</h3>
@@ -214,19 +214,19 @@
         <h3>Receipt Totals</h3>
         <div class="total-row">
           <span>Subtotal:</span>
-          <span>${{ result_data.subtotal }}</span>
+          <span>${{ data.subtotal }}</span>
         </div>
         <div class="total-row">
           <span>Tax:</span>
-          <span>${{ result_data.tax }}</span>
+          <span>${{ data.tax }}</span>
         </div>
         <div class="total-row">
           <span>Tip:</span>
-          <span>${{ result_data.tip }}</span>
+          <span>${{ data.tip }}</span>
         </div>
         <div class="total-row grand-total">
           <span>Grand Total:</span>
-          <span>${{ result_data.total }}</span>
+          <span>${{ data.total }}</span>
         </div>
       </div>
 

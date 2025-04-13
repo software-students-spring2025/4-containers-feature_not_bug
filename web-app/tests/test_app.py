@@ -21,20 +21,6 @@ def fixture_client():
         yield testing_client
 
 
-@pytest.fixture(name="db")
-def fixture_db():
-    """
-    Connect to the MongoDB database
-    """
-    uri = os.getenv("MONGO_URI")
-    mongo = MongoClient(uri, server_api=ServerApi("1"), tlsCAFile=certifi.where())
-    dbname = os.getenv("MONGO_DB", "dutch_pay")
-
-    # Get DB connection
-    db = mongo[dbname]
-    yield db
-
-
 def test_index_route(client):
     """Request the path '/' and ensure a 200 code response"""
     response = client.get("/")
@@ -206,27 +192,21 @@ def test_get_with_invalid_session(client):
     assert response.status_code == 404
     assert b"No results found" == response.data
 
-""" 
-def test_get_with_valid_session(client, db):
-    ""Try sending get request to /result with configured session variables, valid value""
 
-    # add dummy entry to database
-    db_name = os.getenv("MONGO_DBNAME")
-    result = db[db_name].receipts.insert_one({"receipt_text": "this is dummy text - this entry in the database is false, used purely for pytest."})
-    
+def test_get_with_valid_session(client):
+    """Try sending get request to /result with configured session variables, valid value"""
+
     # set session variable
     with client.session_transaction() as session:
-        session["result_id"] = result.inserted_id
+        session["result_id"] = "67fc3fd6d5619018c1bdf3a2"
 
     # query for the dummy data
     response = client.get("/result")
 
-    # cleanup 
-    db[db_name].receipts.deleteOne({"inserted_id"})
-
     # assertions
+    # affirmative response code
     assert response.status_code == 200
+    # correct template is loading 
     assert b"Individual Breakdown" in response.data
-
-
- """
+    # template contains data from this db query
+    assert b"Charlie" in response.data
