@@ -1,0 +1,19 @@
+name: Build and test Docker images
+on: [push, pull_request]
+
+jobs:
+  build-docker-images:
+    name: build Docker images
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: sanity check 
+        env: 
+            MONGO_DBNAME: ${{ secrets.MONGO_DBNAME }}
+            MONGO_URI: ${{ secrets.MONGO_URI }}
+        run: |
+          echo "hello world"
+
+      
