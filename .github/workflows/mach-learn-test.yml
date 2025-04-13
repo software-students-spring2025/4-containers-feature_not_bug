@@ -23,7 +23,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pipenv install pytest pytest-flask mongomock
+          pipenv install pytest pytest-flask
 
       - name: Install Tesseract OCR
         run: |
