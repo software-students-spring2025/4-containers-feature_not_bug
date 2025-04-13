@@ -9,11 +9,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: sanity check 
-        env: 
-            MONGO_DBNAME: ${{ secrets.MONGO_DBNAME }}
-            MONGO_URI: ${{ secrets.MONGO_URI }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: build web app
         run: |
-          echo "hello world"
+          cd web-app
+          docker build --no-cache -t web-app-4-containers-feature_not_bug:latest .
+          docker run -d -p 5000:5000 web-app-4-containers-feature_not_bug
+
+      - name: try contacting web-app with curl 
+        run: |
+          curl --request GET http://127.0.0.1:5000
 
       
