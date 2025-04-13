@@ -26,3 +26,26 @@ def test_index_contains_text(client):
     """Ensure that the page contains expected text"""
     response = client.get("/")
     assert b"running" in response.data
+
+
+def test_correct_post(client):
+    """Try sending correct post"""
+
+    data = dict(
+        {
+            "receipt": "sample.jpg",
+            "tip": "17.17",
+            "num-people": 4,
+            "person-1-name": "jane",
+            "person-1-items": "chicken, coke",
+            "person-2-name": "joe",
+            "person-2-items": "pesto pasta",
+            "person-3-name": "john",
+            "person-3-items": "calamari, coke",
+            "person-4-name": "jack",
+            "person-4-items": "bread",
+        }
+    )
+
+    response = client.post("/submit", data=data)
+    assert response.status_code == 200
