@@ -2,6 +2,7 @@
 
 import os
 import certifi
+from bson.objectid import ObjectId
 from flask import Flask, render_template, request, session, redirect, url_for
 
 # import pymongo
@@ -20,6 +21,7 @@ def app_setup():
     uri = os.getenv("MONGO_URI")
     client = MongoClient(uri, server_api=ServerApi("1"), tlsCAFile=certifi.where())
     dbname = os.getenv("MONGO_DB", "dutch_pay")
+    db = client[dbname]
     app = Flask(__name__, static_folder="static")
     app.secret_key = os.getenv("SECRET_KEY", "godutch-development-key")
 
@@ -117,23 +119,19 @@ def app_setup():
     @app.route("/result", methods=["GET"])
     def result():
         """
-        Display results of data analysis
+        Display results of data analysis from MongoDB
         """
         result_id = session.get("result_id")
         result_data = None
 
         if result_id:
             try:
-                res = requests.get(
-                    f"http://127.0.0.1:4999/results/{result_id}", timeout=10
-                )
-                if res.status_code == 200:
-                    result_data = res.json()
-                else:
-                    print(f"Error fetching results: {res.text}")
-            except requests.RequestException as req_error:
-                print(f"Error connecting to ML client: {str(req_error)}")
-
+                result_data = db.results.find_one({"_id": ObjectId(result_id),
+                                                  "charge_info":{"$exists":True}
+                                                  })
+                if result_data is None:
+                    print("No results is found in database.")
+                    
         return render_template("result.html", result_data=result_data)
 
     return app
