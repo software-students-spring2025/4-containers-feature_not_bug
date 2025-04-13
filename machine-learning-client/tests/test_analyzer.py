@@ -1,4 +1,4 @@
-""" "This module tests the ML client analyzer algorithm"""
+"""This module tests the ML client analyzer algorithm"""
 
 import pytest
 from analyzer import sanitize_string
