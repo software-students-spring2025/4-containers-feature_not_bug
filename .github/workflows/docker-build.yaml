@@ -23,6 +23,6 @@ jobs:
 
       - name: try contacting web-app with curl 
         run: |
-          curl --request GET http://127.0.0.1:5000
+          curl --request GET http://0.0.0.0:5000
 
       
