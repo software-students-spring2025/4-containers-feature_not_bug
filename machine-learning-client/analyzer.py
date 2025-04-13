@@ -158,13 +158,24 @@ def calculate_charge_per_person(
     return person_totals
 
 
-# def store_receipt_in_db(receipt_img):
-
-
 # img = cv2.imread(r"IMG_2437.png") # Receipt taken from camera
-img = cv2.imread(r"test-receipt_2.jpg")  # pylint: disable=no-member
+# img = cv2.imread(r"test-receipt_2.jpg")  # pylint: disable=no-member
 
-processed_text = pytesseract.image_to_string(process_image(img))
-processed_lines = parse_processed_lines(processed_text.splitlines())
 
-filtered_dishes, other_charges = filter_dishes(processed_lines)
+def process_data(user_input):
+    """Reads the image sent by user, processes information, and stores data in DB"""
+    img = cv2.imread(user_input["receipt"])
+
+    processed_text = pytesseract.image_to_string(process_image(img))
+    processed_lines = parse_processed_lines(processed_text.splitlines())
+
+    filtered_dishes, other_charges = filter_dishes(processed_lines)
+
+    charge_per_person = calculate_charge_per_person(
+        user_input, filtered_dishes, other_charges
+    )
+
+    print(charge_per_person)  # Temporary print to cover linting
+
+    # store receipt in DB
+    # store charge_per_person in DB
