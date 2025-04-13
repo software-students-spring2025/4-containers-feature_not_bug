@@ -3,7 +3,7 @@
 # import datetime
 import os
 import certifi
-from flask import Flask, render_template, request  # , url_for, redirect, session
+from flask import Flask, render_template, request, session, redirect, url_for
 
 # import pymongo
 # from bson.objectid import ObjectId
@@ -22,10 +22,14 @@ def app_setup():
     # connect MongoDB
     uri = os.getenv("MONGO_URI")
     client = MongoClient(uri, server_api=ServerApi("1"), tlsCAFile=certifi.where())
-    dbname = os.getenv("MONGO_DBNAME")
+    dbname = os.getenv("MONGO_DB")  
     my_db = client[dbname]
 
-    app = Flask(__name__, static_folder="assets")
+    app = Flask(__name__, static_folder="static")
+    app.secret_key = os.getenv("SECRET_KEY", "godutch-development-key")
+
+    # Ensure the static folders exist
+    os.makedirs(os.path.join(app.static_folder, "uploads"), exist_ok=True)
 
     @app.route("/", methods=("GET", "POST"))
     def show_dashboard():
@@ -77,13 +81,9 @@ def app_setup():
             )
         if "." in s:
             if len(s.split(".")) != 2 or len(s.split(".")[1]) > 2:
-                # the tip contains more than one decimal point,
-                # or contains no digits before or after it,
-                # or has more than two digits after the decimal point
                 return "Error in entered tip", 400
         data.append(("tip", tip))
 
-        # compile data to final form
         for i in range(0, num):
             data.append(
                 (
@@ -98,36 +98,52 @@ def app_setup():
                 )
             )
 
-        # send data
-        res = requests.post("http://127.0.0.1:4999/submit", data=data, timeout=60)
-        if res.status_code == 200:
-            print("received")
-        else:
+        try:
+            res = requests.post("http://127.0.0.1:4999/submit", data=data, timeout=60)
+            if res.status_code == 200:
+                print("received successful response from ML client")
+                result_data = res.json()
+                session['result_id'] = result_data.get('result_id')
+                return redirect(url_for('result'))
+            else:
+                return (
+                    f"Error processing receipt: {res.text}",
+                    400,
+                )
+        except requests.RequestException as e:
             return (
-                "error in sending/receiving - "
-                "ensure ML client is running properly on port 4999",
+                "Error connecting to ML client - ensure ML client is running properly on port 4999: " + str(e),
                 400,
             )
 
-        return render_template("upload.html", data=data)  # render home page template
+        return render_template("upload.html")
 
-    @app.route("/result", methods=("GET", "POST"))
+    @app.route("/result", methods=["GET"])
     def result():
         """
         Display results of data analysis
         """
-        if my_db:
-            pass
+        result_id = session.get('result_id')
+        result_data = None
 
-        return "This page not yet set up", 200
+        if result_id:
+            try:
+                res = requests.get(f"http://127.0.0.1:4999/results/{result_id}", timeout=10)
+                if res.status_code == 200:
+                    result_data = res.json()
+                else:
+                    print(f"Error fetching results: {res.text}")
+            except requests.RequestException as e:
+                print(f"Error connecting to ML client: {str(e)}")
+
+        return render_template("result.html", result_data=result_data)
 
     return app
 
 
 my_app = app_setup()
 
-# keep alive
 if __name__ == "__main__":
     my_app.run(
         debug=True
-    )  # running your server on development mode, setting debug to True
+    ) 
