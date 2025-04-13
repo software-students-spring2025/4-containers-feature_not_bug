@@ -139,7 +139,6 @@ def app_setup():
 
     return app
 
-
 my_app = app_setup()
 
 if __name__ == "__main__":
