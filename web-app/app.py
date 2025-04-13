@@ -128,16 +128,13 @@ def app_setup():
                     {"_id": ObjectId(result_id), "charge_info": {"$exists": True}}
                 )
                 if not result_data:
-                    return("No results found", 404)
+                    return ("No results found", 404)
             except Exception as e:
-                print(f"Error fetching result: {str(e)}", 400)
-                
+                return (f"Error fetching result: {str(e)}", 400)  
         else:
             return ("No result_id found in session", 400)
             
         return render_template("result.html", result_data=result_data)
-
-    return app
 
 my_app = app_setup()
 
