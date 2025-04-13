@@ -125,8 +125,8 @@ def app_setup():
         if result_id:
             try:
                 # Query MongoDB for charge_info data based on result_id
-                result_data = db.receipts.find_one({
-                    "_id": ObjectId(result_id), "charge_info": { "$exists": True }}
+                result_data = db.receipts.find_one(
+                    {"_id": ObjectId(result_id), "charge_info": { "$exists": True }}
                 )
             except Exception as e:
                 print(f"Error fetching result from MongoDB: {e}")
