@@ -61,7 +61,6 @@ def app_setup():
             )
 
         # process data .....
-        print(data)
         if my_db["receipts"].find({}):
             pass
 
