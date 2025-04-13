@@ -23,7 +23,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pipenv install pytest pytest-flask coverage
+          pipenv install pytest pytest-flask coverage mongomock
 
       - name: Install Tesseract OCR
         run: |
@@ -38,9 +38,9 @@ jobs:
           pipenv run python -m pytest
 
       - name: Test with coverage
-        env: 
-            MONGO_DBNAME: ${{ secrets.MONGO_DBNAME }}
-            MONGO_URI: ${{ secrets.MONGO_URI }}
+        env:
+          MONGO_DBNAME: ${{ secrets.MONGO_DBNAME }}
+          MONGO_URI: ${{ secrets.MONGO_URI }}
         run: |
           pipenv run coverage run -m pytest
           pipenv run coverage report -i
