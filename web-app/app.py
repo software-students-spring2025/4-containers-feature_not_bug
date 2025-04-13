@@ -136,6 +136,8 @@ def app_setup():
             
         return render_template("result.html", result_data=result_data)
 
+    return app
+
 my_app = app_setup()
 
 if __name__ == "__main__":
