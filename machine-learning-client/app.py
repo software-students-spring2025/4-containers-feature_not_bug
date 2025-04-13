@@ -1,30 +1,12 @@
 """Flask application for Machine Learning Client API"""
 
-# import datetime
-import os
-import certifi
 from flask import Flask, request  # , url_for, redirect, session
 
-# import pymongo
-# from bson.objectid import ObjectId
-# import database, filter
-# requests
-from pymongo.mongo_client import MongoClient
-from pymongo.server_api import ServerApi
-from dotenv import load_dotenv
-
-# load environment variables
-load_dotenv()
+from analyzer import process_data
 
 
 def app_setup():
     """setup the app"""
-    # connect MongoDB
-    uri = os.getenv("MONGO_URI")
-    client = MongoClient(uri, server_api=ServerApi("1"), tlsCAFile=certifi.where())
-    dbname = os.getenv("MONGO_DBNAME")
-    my_db = client[dbname]
-
     app = Flask(__name__, static_folder="assets")
 
     @app.route("/", methods=["GET"])
@@ -60,13 +42,15 @@ def app_setup():
                 }
             )
 
-        # process data .....
-        if my_db["receipts"].find({}):
-            pass
+        try:
+            process_data(data)
+            return "Receipt received, processed, and stored in DB", 200
 
-        # return confirmation of completion
-        return "received", 200
-        # etc
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            return (
+                e,
+                500,
+            )
 
     return app
 
