@@ -162,8 +162,8 @@ def test_correct_post(client):
     )
 
     try:
-        client.post("/upload", data=data)
+        response = client.post("/upload", data=data)
     except conn_err:
         assert True
     else:
-        assert False
+        assert response.status_code == 400
