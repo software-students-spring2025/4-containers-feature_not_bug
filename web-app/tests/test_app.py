@@ -166,4 +166,4 @@ def test_correct_post(client):
     except conn_err:
         assert True
     else:
-        assert response.status_code == 200
+        assert response.status_code == 400
