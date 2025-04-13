@@ -167,3 +167,22 @@ def test_correct_post(client):
         assert True
     else:
         assert response.status_code == 400
+
+
+def test_get_no_session(client):
+    """Try sending get request to /result with no configured session variables"""
+
+    response = client.get("/result")
+    assert response.status_code == 400
+    assert response.data == b"No result_id found in session"
+
+
+def test_get_with_session(client):
+    """Try sending get request to /result with configured session variables"""
+
+    with client.session_transaction() as session:
+        session["result_id"] = "redacted"
+
+    response = client.get("/result")
+    assert response.status_code == 200
+    assert b"Individual Breakdown" in response.data
