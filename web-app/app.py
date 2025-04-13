@@ -131,7 +131,10 @@ def app_setup():
                     return ("No results found", 404)
             except Exception as e:
                 
-                return (f"Error fetching result: {str(e)}", 400)  
+                return (
+                    f"Error fetching result: {str(e)}", 
+                    400,
+                )  
         else:
             return ("No result_id found in session", 400)
 
