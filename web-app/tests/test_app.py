@@ -1,9 +1,13 @@
 """Module created to test the GoDutch Flask application"""
 
 import pytest
+import os
+import certifi
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+# from bson.objectid import ObjectId
 from requests.exceptions import ConnectionError as conn_err
 from app import app_setup  # Flask instance of the API
-from bson.objectid import ObjectId
 
 
 @pytest.fixture(name="client")
@@ -15,6 +19,20 @@ def fixture_client():
     app.testing = True  # necessary for assertions to work correctly
     with app.test_client() as testing_client:
         yield testing_client
+
+
+@pytest.fixture(name="db")
+def fixture_db():
+    """
+    Connect to the MongoDB database
+    """
+    uri = os.getenv("MONGO_URI")
+    mongo = MongoClient(uri, server_api=ServerApi("1"), tlsCAFile=certifi.where())
+    dbname = os.getenv("MONGO_DB", "dutch_pay")
+
+    # Get DB connection
+    db = mongo[dbname]
+    yield db
 
 
 def test_index_route(client):
@@ -182,19 +200,33 @@ def test_get_with_invalid_session(client):
     """Try sending get request to /result with configured session variables, but invalid value"""
 
     with client.session_transaction() as session:
-        session["result_id"] = ObjectId("111111111111")
+        session["result_id"] = "67bd4bec5fc8bed996c3671d"
 
     response = client.get("/result")
     assert response.status_code == 404
     assert b"No results found" == response.data
 
+""" 
+def test_get_with_valid_session(client, db):
+    ""Try sending get request to /result with configured session variables, valid value""
 
-def test_get_with_valid_session(client):
-    """Try sending get request to /result with configured session variables, valid value"""
-
+    # add dummy entry to database
+    db_name = os.getenv("MONGO_DBNAME")
+    result = db[db_name].receipts.insert_one({"receipt_text": "this is dummy text - this entry in the database is false, used purely for pytest."})
+    
+    # set session variable
     with client.session_transaction() as session:
-        session["result_id"] = ObjectId("111111111111")
+        session["result_id"] = result.inserted_id
 
+    # query for the dummy data
     response = client.get("/result")
+
+    # cleanup 
+    db[db_name].receipts.deleteOne({"inserted_id"})
+
+    # assertions
     assert response.status_code == 200
     assert b"Individual Breakdown" in response.data
+
+
+ """
