@@ -72,6 +72,49 @@ cd machine-learning-client
 pipenv run pytest
 ```
 
+### Docker Setup
+
+You can containerize and run the entire application using Docker and Docker Compose
+
+**Prerequistes**
+Make sure you have the following installed:
+- [Docker](https://www.docker.com/get-started/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+**Running the App with Docker**
+
+To spin up both the machine learning client and webapp in containers:
+
+``` bash
+git clone https://github.com/software-students-spring2025/4-containers-feature_not_bug.git
+cd 4-containers-feature_not_bug
+docker-compose up --build
+```
+
+This will:
+- Build both the ML Client and Web App containers,
+- Start the services on the default ports:
+  - web-app: http://localhost:5000
+  - ml-client: accessible internally via the Docker network
+ 
+**Environment Variables**
+
+Create a .env file in the root directory (or as needed in each service folder):
+
+``` bash
+MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/dbname
+MONGO_DBNAME="dutch_pay"
+```
+
+**Stopping the containers**
+
+When you're done:
+
+```bash
+docker-compose down
+```
+
+
 ### Additional Information
 
 - Be sure to run both servers at the same time to fully test functionality.
