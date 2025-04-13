@@ -121,15 +121,18 @@ def app_setup():
         """
         result_id = session.get("result_id")
 
+        # if this endpoint is called without a proper session
         if not result_id:
             return ("No result_id found in session", 400)
 
+        # get the results data from the database
         result_data = db.receipts.find_one(
             {"_id": ObjectId(result_id), "charge_info": {"$exists": True}}
         )
         if not result_data:
             return ("No results found", 404)
 
+        # return the results HTML page
         return render_template("result.html", result_data=result_data)
 
     return app
