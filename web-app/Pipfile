@@ -14,10 +14,12 @@ pytest-flask = "*"
 pylint = "*"
 black = "*"
 requests = "*"
+coverage = "*"
 
 [dev-packages]
 pytest = "*"
 pytest-flask = "*"
+coverage = "*"
 
 [requires]
 python_version = "3"

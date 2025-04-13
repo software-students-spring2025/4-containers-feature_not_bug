@@ -17,10 +17,12 @@ black = "*"
 pytesseract = "*"
 opencv-python = "*"
 requests = "*"
+coverage = "*"
 
 [dev-packages]
 pytest = "*"
 pytest-flask = "*"
+coverage = "*"
 
 [requires]
 python_version = "3"
