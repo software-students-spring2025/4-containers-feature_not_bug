@@ -1,7 +1,7 @@
 """Module created to test the ML client Flask server API"""
 
-import pytest
 import io
+import pytest
 from app import app_setup  # Flask instance of the API
 
 

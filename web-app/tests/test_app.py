@@ -1,7 +1,7 @@
 """Module created to test the GoDutch Flask application"""
 
-import pytest
 import io
+import pytest
 from requests.exceptions import ConnectionError as conn_err
 from werkzeug.datastructures import FileStorage
 from app import app_setup  # Flask instance of the API
@@ -24,7 +24,7 @@ def fixture_files():
     Create and yield a file (sample image) to use when testing file uploads
     """
     file = None
-    with open("images/IMG_2437.png") as fp:
+    with open("images/IMG_2437.png", "rb") as fp:
         file = FileStorage(fp)
         files = {
             "receipt": (
@@ -49,7 +49,7 @@ def test_index_contains_text(client):
     assert b"GoDutch" in response.data
 
 
-def test_error_bad_receipt(client, files):
+def test_error_bad_receipt(client):
     """Try sending erroneous post requests -- empty receipts"""
 
     data_with_errors = dict(
@@ -73,7 +73,7 @@ def test_error_bad_receipt(client, files):
     assert response.data == b"Receipt image not found 1"
 
 
-def test_error_tip(client, files):
+def test_error_tip(client):
     """Try sending erroneous post requests -- tip with too many decimal points, too many digits"""
 
     data_with_errors = dict(
@@ -116,10 +116,13 @@ def test_error_tip(client, files):
 
     response = client.post("/upload", data=data_with_errors)
     assert response.status_code == 400
-    assert response.data == b"Tip cannot be converted into a decimal and was likely entered wrong"
+    assert (
+        response.data
+        == b"Tip cannot be converted into a decimal and was likely entered wrong"
+    )
 
 
-def test_error_num_people(client, files):
+def test_error_num_people(client):
     """Try sending erroneous post requests -- num people mismatched with descriptions"""
 
     data_with_errors = dict(
@@ -164,7 +167,7 @@ def test_error_num_people(client, files):
     assert response.status_code == 400
 
 
-def test_correct_post(client, files):
+def test_correct_post(client):
     """Try sending correct post"""
 
     data = dict(
@@ -186,7 +189,7 @@ def test_correct_post(client, files):
 
     try:
         # trying to POST to a running ML client; gets a connectivity error
-        response = client.post("/upload", content_type='multipart/form-data', data=data)
+        response = client.post("/upload", data=data)
     except conn_err:
         assert True
     else:
