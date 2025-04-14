@@ -89,11 +89,20 @@ def parse_processed_lines(lines):
     return entries
 
 
+def normalize_text(text):
+    """Removes commas, colons, dashes, and extra spaces from text"""
+    # Remove dashes, commas, colons, and extra spaces.
+    text = text.lower()
+    text = re.sub(r"[-:,]", "", text)
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
+
+
 def normalize_dictionary_list(dictionary_list):
     """Converts a list of dictionaries into a single dictionary"""
     dictionary = {}
     for entry in dictionary_list:
-        key = entry["dish"].strip().lower()
+        key = normalize_text(entry["dish"])
         dictionary[key] = entry["price"]
     return dictionary
 
@@ -110,6 +119,7 @@ def calculate_charge_per_person(
 ):  # pylint: disable=too-many-locals
     """Calculate the total amount per person according to the provided bill"""
     # Convert charge_entries and dish_prices list of dictionaries into a single dictionary
+
     charges_dict = normalize_dictionary_list(charge_entries)
     dish_prices = normalize_dictionary_list(dish_entries)
 
@@ -117,11 +127,11 @@ def calculate_charge_per_person(
     subtotal_from_receipt = charges_dict.get("subtotal")
     tax_from_receipt = charges_dict.get("tax")
 
-    print(subtotal_from_receipt)
-    print(tax_from_receipt)
+    print("Subtotal from receipt:", subtotal_from_receipt)
+    print("Tax from receipt:", tax_from_receipt)
 
     # Extract tip from user input
-    tip = user_input.get("tip", 0.0)
+    tip = float(user_input.get("tip", 0.0))
 
     # Get the list of people ordering
     people = user_input.get("people", [])
@@ -157,6 +167,7 @@ def calculate_charge_per_person(
     # Calculate each person's share of the tip and tax proportionally
     for name in person_totals:
         base = person_totals[name]
+
         # Initialize tip_share and tax_share (linting)
         tip_share = 0.0
         tax_share = 0.0
@@ -181,7 +192,6 @@ def process_data(user_input, receipt_file):
     charge_per_person = calculate_charge_per_person(
         user_input, filtered_dishes, other_charges
     )
-    print(charge_per_person)
 
     charge_id = store_receipt_info(processed_text, charge_per_person)
 
