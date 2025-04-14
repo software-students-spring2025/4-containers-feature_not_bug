@@ -20,6 +20,7 @@ def app_setup():  # pylint: disable=too-many-statements
     )
     dbname = os.getenv("MONGO_DB", "dutch_pay")  # pylint: disable=unused-variable
     app = Flask(__name__, static_folder="static")
+    app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16 MB
     app.secret_key = os.getenv("SECRET_KEY", "godutch-development-key")
 
     os.makedirs(os.path.join(app.static_folder, "uploads"), exist_ok=True)
@@ -58,11 +59,12 @@ def app_setup():  # pylint: disable=too-many-statements
 
         if (
             "capture-receipt" in request.files
-            and request.files["capture-receipt"] != ""
+            and request.files["capture-receipt"].filename != ""
         ):
             receipt_file = request.files["capture-receipt"]
         elif (
-            "upload-receipt" in request.files and request.files["upload-receipt"] != ""
+            "upload-receipt" in request.files
+            and request.files["upload-receipt"].filename != ""
         ):
             receipt_file = request.files["upload-receipt"]
         else:
