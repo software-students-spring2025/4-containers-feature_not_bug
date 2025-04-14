@@ -1,11 +1,6 @@
 """Module created to test the GoDutch Flask application"""
 
 import pytest
-import os
-import certifi
-from pymongo.mongo_client import MongoClient
-from pymongo.server_api import ServerApi
-# from bson.objectid import ObjectId
 from requests.exceptions import ConnectionError as conn_err
 from app import app_setup  # Flask instance of the API
 
@@ -208,7 +203,7 @@ def test_get_with_valid_session(client):
     # assertions
     # affirmative response code
     assert response.status_code == 200
-    # correct template is loading 
+    # correct template is loading
     assert b"Individual Breakdown" in response.data
     # template contains data from this db query
     assert b"Charlie" in response.data
