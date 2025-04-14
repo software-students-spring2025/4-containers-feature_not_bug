@@ -69,7 +69,7 @@
       <canvas id="canvas" style="display:none;"></canvas>
       <img id="preview" alt="Captured Receipt Preview" />
 
-      <input type="hidden" id="manual-capture" name="capture-receipt" accept="image/*" />
+      <input type="file" id="manual-capture" name="capture-receipt" accept="image/*" style="display: none;" />
 
       <button id="next-btn" type="button" onclick="nextPage()">Next</button>
     </div>
@@ -131,6 +131,13 @@
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
       const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+      const file = new File([blob], 'captured_receipt.png', { type: 'image/png' });
+
+      const captureInput = document.getElementById('manual-capture');
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+      captureInput.files = dataTransfer.files;
+
       const src = URL.createObjectURL(blob);
       preview.src = src
       preview.style.display = 'block';
@@ -156,15 +163,19 @@
     }
 
     function nextPage() {
-      console.log(document.getElementById("upload-receipt").value)
-      console.log(document.getElementById("manual-capture").value)
-      if (document.getElementById("upload-receipt").value != "" && document.getElementById("manual-capture").value != "") {
+      const uploadFiles = document.getElementById("upload-receipt").files;
+      const captureFiles = document.getElementById("manual-capture").files;
+
+      console.log("upload-receipt files:", uploadFiles)
+      console.log("manual-capture files:", captureFiles)
+
+      if (uploadFiles.length > 0 && captureFiles.length > 0) {
         err = document.createElement("p")
         err.innerText = "error: cannot upload two images - must choose between upload and manual capture"
         err.style.color = 'red'
         document.getElementById("step-1").appendChild(err)
       }
-      else if (document.getElementById("upload-receipt").value == "" && document.getElementById("manual-capture").value == "") {
+      else if (uploadFiles.length === 0 && captureFiles.length === 0) {
         err = document.createElement("p")
         err.innerText = "error: must provide an image of a receipt - either upload or take a picture"
         err.style.color = 'red'
