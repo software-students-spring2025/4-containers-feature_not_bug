@@ -28,15 +28,19 @@ def app_setup():  # pylint: disable=too-many-statements
     # Get DB connection
     db = client[dbname]
 
-    @app.route("/", methods=["GET"])
+    @app.route("/", methods=("GET", "POST"))
     def show_dashboard():
         """
         Show homepage / dashboard
         """
 
-        return render_template("index.html")
+        data = {}
+        if request.method == "GET":
+            data = {"filler": "filler"}
 
-    @app.route("/upload", methods=["POST"])
+        return render_template("index.html", data=data)
+
+    @app.route("/upload", methods=("GET", "POST"))
     def upload():  # pylint: disable=too-many-return-statements
         """
         Handle form submission when receipt is uploaded
@@ -58,15 +62,11 @@ def app_setup():  # pylint: disable=too-many-statements
             and request.files["capture-receipt"].filename != ""
         ):
             receipt_file = request.files["capture-receipt"]
-            print(receipt_file)
-            print(type(receipt_file))
         elif (
             "upload-receipt" in request.files
             and request.files["upload-receipt"].filename != ""
         ):
             receipt_file = request.files["upload-receipt"]
-            print(receipt_file)
-            print(type(receipt_file))
         else:
             return "Receipt image not found 2", 400
 
@@ -117,8 +117,11 @@ def app_setup():  # pylint: disable=too-many-statements
         }
 
         try:
+            host = os.getenv("ML_CLIENT")
+            if host is None:
+                host = "127.0.0.1"
             res = requests.post(
-                "http://127.0.0.1:4999/submit", data=data, files=files, timeout=60
+                "http://" + host + ":4999/submit", data=data, files=files, timeout=60
             )
             if res.status_code == 200:
                 # print("received successful response from ML client")
