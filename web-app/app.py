@@ -121,7 +121,7 @@ def app_setup():  # pylint: disable=too-many-statements
                 f"http://${os.getenv('ML_CLIENT', 'localhost')}:4999/submit", 
                 data=data, 
                 files=files, 
-                timeout=60
+                timeout=60,
             )
             if res.status_code == 200:
                 # print("received successful response from ML client")
