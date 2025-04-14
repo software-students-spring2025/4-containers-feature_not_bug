@@ -51,6 +51,7 @@ def test_error_bad_receipt(client):
 
     response = client.post("/upload", data=data_with_errors)
     assert response.status_code == 400
+    assert response.data == b"Receipt image not found 2"
 
 
 def test_error_tip(client):
@@ -75,6 +76,7 @@ def test_error_tip(client):
 
     response = client.post("/upload", data=data_with_errors)
     assert response.status_code == 400
+    assert response.data == b"Error in format of entered tip"
 
     data_with_errors = dict(
         {
@@ -95,6 +97,7 @@ def test_error_tip(client):
 
     response = client.post("/upload", data=data_with_errors)
     assert response.status_code == 400
+    assert response.data == b"Tip cannot be converted into a decimal and was likely entered wrong"
 
 
 def test_error_num_people(client):
@@ -117,6 +120,7 @@ def test_error_num_people(client):
 
     response = client.post("/upload", data=data_with_errors)
     assert response.status_code == 400
+    assert response.data == b"Number of people mismatched"
 
     data_with_errors = dict(
         {
@@ -162,6 +166,7 @@ def test_correct_post(client):
     )
 
     try:
+        # trying to POST to a running ML client; gets a connectivity error
         response = client.post("/upload", data=data)
     except conn_err:
         assert True
@@ -181,7 +186,7 @@ def test_get_with_invalid_session(client):
     """Try sending get request to /result with configured session variables, but invalid value"""
 
     with client.session_transaction() as session:
-        session["result_id"] = "67bd4bec5fc8bed996c3671d"
+        session["result_id"] = "111111111111111111111111"
 
     response = client.get("/result")
     assert response.status_code == 404
