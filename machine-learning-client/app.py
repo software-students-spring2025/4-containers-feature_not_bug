@@ -42,7 +42,7 @@ def app_setup():
             )
 
         if "receipt" not in request.files:
-            return jsonify({"error": "No receipt file provided"}), 400
+            return ("receipt not provided in files", 400)
         receipt_file = request.files["receipt"]
         print("ML Client: Received receipt file with filename:", receipt_file.filename)
 

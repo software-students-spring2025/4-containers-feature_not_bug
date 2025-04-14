@@ -31,9 +31,15 @@ def test_index_contains_text(client):
 def test_correct_post(client):
     """Try sending correct post"""
 
+    files = {
+        "receipt": (
+            'fake',
+            'fake',
+            'fake',
+        )
+    }
     data = dict(
         {
-            "receipt": "sample.jpg",
             "tip": "17.17",
             "num-people": 4,
             "person-1-name": "jane",
@@ -48,4 +54,5 @@ def test_correct_post(client):
     )
 
     response = client.post("/submit", data=data)
-    assert response.status_code == 200
+    assert response.status_code == 400
+    assert b"receipt not provided in files" == response.data
