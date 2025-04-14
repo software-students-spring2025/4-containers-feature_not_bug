@@ -28,19 +28,15 @@ def app_setup():  # pylint: disable=too-many-statements
     # Get DB connection
     db = client[dbname]
 
-    @app.route("/", methods=("GET", "POST"))
+    @app.route("/", methods=["GET"])
     def show_dashboard():
         """
         Show homepage / dashboard
         """
 
-        data = {}
-        if request.method == "GET":
-            data = {"filler": "filler"}
+        return render_template("index.html")
 
-        return render_template("index.html", data=data)
-
-    @app.route("/upload", methods=("GET", "POST"))
+    @app.route("/upload", methods=["POST"])
     def upload():  # pylint: disable=too-many-return-statements
         """
         Handle form submission when receipt is uploaded

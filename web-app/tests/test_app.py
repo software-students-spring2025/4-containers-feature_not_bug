@@ -1,7 +1,9 @@
 """Module created to test the GoDutch Flask application"""
 
 import pytest
+import io
 from requests.exceptions import ConnectionError as conn_err
+from werkzeug.datastructures import FileStorage
 from app import app_setup  # Flask instance of the API
 
 
@@ -14,6 +16,24 @@ def fixture_client():
     app.testing = True  # necessary for assertions to work correctly
     with app.test_client() as testing_client:
         yield testing_client
+
+
+@pytest.fixture(name="files")
+def fixture_files():
+    """
+    Create and yield a file (sample image) to use when testing file uploads
+    """
+    file = None
+    with open("images/IMG_2437.png") as fp:
+        file = FileStorage(fp)
+        files = {
+            "receipt": (
+                file.filename,
+                file.stream,
+                file.mimetype,
+            )
+        }
+        yield files
 
 
 def test_index_route(client):
@@ -29,7 +49,7 @@ def test_index_contains_text(client):
     assert b"GoDutch" in response.data
 
 
-def test_error_bad_receipt(client):
+def test_error_bad_receipt(client, files):
     """Try sending erroneous post requests -- empty receipts"""
 
     data_with_errors = dict(
@@ -48,19 +68,18 @@ def test_error_bad_receipt(client):
             "person-4-desc": "bread",
         }
     )
-
     response = client.post("/upload", data=data_with_errors)
     assert response.status_code == 400
-    assert response.data == b"Receipt image not found 2"
+    assert response.data == b"Receipt image not found 1"
 
 
-def test_error_tip(client):
+def test_error_tip(client, files):
     """Try sending erroneous post requests -- tip with too many decimal points, too many digits"""
 
     data_with_errors = dict(
         {
             "upload-receipt": "",
-            "capture-receipt": "sample.jpg",
+            "capture-receipt": (io.BytesIO(b"some initial text data"), "filename.png"),
             "tip": "17.111117",
             "num-people": 4,
             "person-1-name": "jane",
@@ -81,7 +100,7 @@ def test_error_tip(client):
     data_with_errors = dict(
         {
             "upload-receipt": "",
-            "capture-receipt": "sample.jpg",
+            "capture-receipt": (io.BytesIO(b"some initial text data"), "filename.png"),
             "tip": "17.11.11",
             "num-people": 4,
             "person-1-name": "jane",
@@ -100,13 +119,13 @@ def test_error_tip(client):
     assert response.data == b"Tip cannot be converted into a decimal and was likely entered wrong"
 
 
-def test_error_num_people(client):
+def test_error_num_people(client, files):
     """Try sending erroneous post requests -- num people mismatched with descriptions"""
 
     data_with_errors = dict(
         {
             "upload-receipt": "",
-            "capture-receipt": "sample.jpg",
+            "capture-receipt": (io.BytesIO(b"some initial text data"), "filename.png"),
             "tip": "17.17",
             "num-people": 4,
             "person-1-name": "jane",
@@ -125,7 +144,7 @@ def test_error_num_people(client):
     data_with_errors = dict(
         {
             "upload-receipt": "",
-            "capture-receipt": "sample.jpg",
+            "capture-receipt": (io.BytesIO(b"some initial text data"), "filename.png"),
             "tip": "17.17",
             "num-people": 4,
             "person-1-name": "jane",
@@ -145,13 +164,13 @@ def test_error_num_people(client):
     assert response.status_code == 400
 
 
-def test_correct_post(client):
+def test_correct_post(client, files):
     """Try sending correct post"""
 
     data = dict(
         {
             "upload-receipt": "",
-            "capture-receipt": "sample.jpg",
+            "capture-receipt": (io.BytesIO(b"some initial text data"), "filename.png"),
             "tip": "17.17",
             "num-people": 4,
             "person-1-name": "jane",
@@ -167,7 +186,7 @@ def test_correct_post(client):
 
     try:
         # trying to POST to a running ML client; gets a connectivity error
-        response = client.post("/upload", data=data)
+        response = client.post("/upload", content_type='multipart/form-data', data=data)
     except conn_err:
         assert True
     else:
