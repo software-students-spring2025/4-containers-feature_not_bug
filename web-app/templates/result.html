@@ -180,32 +180,32 @@
     <div class="results-container">
       <h2 style="text-align: center;">Individual Breakdown</h2>
       
-      {% for person in data.people %}
+      {% for person in data["people"] %}
       <div class="person-card">
         <div class="person-header">
-          <h3 class="person-name">{{ person.name }}</h3>
-          <div class="person-total">${{ person.total }}</div>
+          <h3 class="person-name">{{ person["name"] }}</h3>
+          <div class="person-total">${{ person["total"] }}</div>
         </div>
 
         <ul class="item-list">
-          {% for item in person.items %}
+          {% for item in person["items"] %}
           <li class="item">
-            <span class="item-name">{{ item.name }}</span>
-            <span class="item-price">${{ item.price }}</span>
+            <span class="item-name">{{ item["name"] }}</span>
+            <span class="item-price">${{ item["price"] }}</span>
           </li>
           {% endfor %}
 
-          {% if person.tax > 0 %}
+          {% if person["tax"] > 0 %}
           <li class="item">
             <span class="item-name">Tax</span>
-            <span class="item-price">${{ person.tax }}</span>
+            <span class="item-price">${{ person["tax"] }}</span>
           </li>
           {% endif %}
 
-          {% if person.tip > 0 %}
+          {% if person["tip"] > 0 %}
           <li class="item">
             <span class="item-name">Tip</span>
-            <span class="item-price">${{ person.tip }}</span>
+            <span class="item-price">${{ person["tip"] }}</span>
           </li>
           {% endif %}
         </ul>
@@ -216,19 +216,19 @@
         <h3>Receipt Totals</h3>
         <div class="total-row">
           <span>Subtotal:</span>
-          <span>${{ data.subtotal }}</span>
+          <span>${{ data["subtotal"] }}</span>
         </div>
         <div class="total-row">
           <span>Tax:</span>
-          <span>${{ data.tax }}</span>
+          <span>${{ data["tax"] }}</span>
         </div>
         <div class="total-row">
           <span>Tip:</span>
-          <span>${{ data.tip }}</span>
+          <span>${{ data["tip"] }}</span>
         </div>
         <div class="total-row grand-total">
           <span>Grand Total:</span>
-          <span>${{ data.total }}</span>
+          <span>${{ data["total"] }}</span>
         </div>
       </div>
 

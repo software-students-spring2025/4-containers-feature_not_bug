@@ -203,6 +203,8 @@ def test_get_with_valid_session(client):
     # query for the dummy data
     response = client.get("/result")
 
+    print(response.data)
+
     # assertions
     # affirmative response code
     assert response.status_code == 200
