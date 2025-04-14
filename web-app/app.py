@@ -28,19 +28,15 @@ def app_setup():  # pylint: disable=too-many-statements
     # Get DB connection
     db = client[dbname]
 
-    @app.route("/", methods=("GET", "POST"))
+    @app.route("/", methods=["GET"])
     def show_dashboard():
         """
         Show homepage / dashboard
         """
 
-        data = {}
-        if request.method == "GET":
-            data = {"filler": "filler"}
+        return render_template("index.html")
 
-        return render_template("index.html", data=data)
-
-    @app.route("/upload", methods=("GET", "POST"))
+    @app.route("/upload", methods=["POST"])
     def upload():  # pylint: disable=too-many-return-statements
         """
         Handle form submission when receipt is uploaded
@@ -62,11 +58,15 @@ def app_setup():  # pylint: disable=too-many-statements
             and request.files["capture-receipt"].filename != ""
         ):
             receipt_file = request.files["capture-receipt"]
+            print(receipt_file)
+            print(type(receipt_file))
         elif (
             "upload-receipt" in request.files
             and request.files["upload-receipt"].filename != ""
         ):
             receipt_file = request.files["upload-receipt"]
+            print(receipt_file)
+            print(type(receipt_file))
         else:
             return "Receipt image not found 2", 400
 
@@ -88,7 +88,7 @@ def app_setup():  # pylint: disable=too-many-statements
             )
         if "." in tip_str:
             if len(tip_str.split(".")) != 2 or len(tip_str.split(".")[1]) > 2:
-                return "Error in entered tip", 400
+                return "Error in format of entered tip", 400
         data.append(("tip", tip))
         for i in range(0, num):
             data.append(
