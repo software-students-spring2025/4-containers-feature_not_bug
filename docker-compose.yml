@@ -7,13 +7,15 @@ services:
       dockerfile: Dockerfile
     container_name: ml-client-4-containers-feature_not_bug
     restart: always
+    ports:
+      - "4999:4999"
     networks:
       - app_network
     volumes:
       - ./machine-learning-client:/app
       - shared_uploads:/app/uploads
     env_file:
-      - .env
+      - ./machine-learning-client/.env
 
   web-app:
     build: 
@@ -31,7 +33,7 @@ services:
       - ./web-app:/app
       - shared_uploads:/app/static/uploads
     env_file:
-      - .env
+      - ./web-app/.env
 
 networks:
   app_network:
