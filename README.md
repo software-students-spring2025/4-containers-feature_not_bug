@@ -6,6 +6,18 @@
 
 GoDutch is an innovative app that allows users to seamlessly split restaurant bills among multiple people. The app utilizes a machine learning client to extract data from receipts, including dishes, taxes, and tips. After uploading or taking a picture of a receipt, users can input the number of people splitting the bill and describe what each person ordered. The app then allocates the tax and tip proportionally among the dishes.
 
+## Table of Contents
+- [Team Members](#team-members)
+- [Project Setup Instructions](#project-setup-instructions)
+  - [Prerequisites](#prerequisites)
+  - [How to Run this Project - No Docker](#how-to-run-this-project---no-docker)
+    - [Running Tests](#running-tests)
+  - [How to Run this Project - With Docker](#how-to-run-this-project---with-docker)
+    - [Prerequisites](#prerequisites-1)
+    - [Running the App with Docker](#running-the-app-with-docker)
+    - [Environment Variables](#environment-variables)
+  - [Additional Information](#additional-information)
+
 ## Team Members
 
 - [Shamaamah Ahmad](https://github.com/shamaamahh)
@@ -18,11 +30,14 @@ GoDutch is an innovative app that allows users to seamlessly split restaurant bi
 ### Prerequisites
 
 Before you begin, ensure you have the following installed on your system:
-- **Python 3.x** (for the machine learning client) - [Install Python 3.x](https://www.python.org/downloads/)
+- **Python 3.x** - [Install Python 3.x](https://www.python.org/downloads/)
 - **pip** (Python package installer) - [Install pip](https://pip.pypa.io/en/stable/)
 - **Git** (for version control) - [Install Git](https://git-scm.com/)
+- **Tesseract** (To run the machine learning client)
+  - Install with `sudo apt-get install -y tesseract-ocr`
 
-### How to Run this Project
+---
+### How to Run this Project - No Docker
 
 1. Clone the repository and cd to the location where you have saved the repo :
 
@@ -30,16 +45,16 @@ Before you begin, ensure you have the following installed on your system:
 git clone https://github.com/software-students-spring2025/4-containers-feature_not_bug.git 
 cd path_to_your_repo_copy
  ```
-2. Run the Machine Learning Client:
+2. Open one terminal to run the Machine Learning Client:
 
 ```bash
 cd machine-learning-client
 pipenv install
 pipenv run python app.py
 ```
-This starts the ML service on http://localhost:5001.
+This starts the ML service on http://localhost:4999.
 
-3. Run the Web App:
+3. Open a second terminal to run the Web App:
 
 ```bash
 cd web-app
@@ -51,12 +66,14 @@ This starts the frontend server on http://localhost:5000.
 4. Create a .env file inside the web-app directory (and machine-learning-client if needed). Here is an example:
 
 ```dotenv
-MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/dbname
-MONGO_DBNAME="dutch_pay" 
+MONGO_URI=mongodb+srv://[username]:[password]@[cluster].mongodb.net/dbname
+MONGO_DBNAME="[database_name]" 
 ```
 
-### Running Tests
-To ensure everything is working as expected, you can run the tests for both parts of the application.
+Populate these variables with true values specific to your cluster, following this format. 
+
+#### Running Tests
+To ensure everything is working as expected, you can run the pytests for both parts of the application.
 
 **Web App Tests**
 
@@ -72,16 +89,16 @@ cd machine-learning-client
 pipenv run pytest
 ```
 
-### Docker Setup
+### How to Run this Project - With Docker
 
 You can containerize and run the entire application using Docker and Docker Compose
 
-**Prerequistes**
+#### Prerequisites
 Make sure you have the following installed:
 - [Docker](https://www.docker.com/get-started/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
-**Running the App with Docker**
+#### Running the App with Docker
 
 To spin up both the machine learning client and webapp in containers:
 
@@ -95,15 +112,15 @@ This will:
 - Build both the ML Client and Web App containers,
 - Start the services on the default ports:
   - web-app: http://localhost:5000
-  - ml-client: accessible internally via the Docker network
+  - ml-client: http://localhost:4999
  
-**Environment Variables**
+#### Environment Variables
 
 Create a .env file in the root directory (or as needed in each service folder):
 
-``` bash
-MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/dbname
-MONGO_DBNAME="dutch_pay"
+``` dotenv
+MONGO_URI=mongodb+srv://[username]:[password]@[cluster].mongodb.net/[dbname]
+MONGO_DBNAME="[database_name]"
 ```
 
 **Stopping the containers**
