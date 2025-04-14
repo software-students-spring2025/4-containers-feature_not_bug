@@ -1,9 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GoDutch - Receipt Splitter</title>
   <style>
     body {
@@ -12,45 +12,53 @@
       max-width: 600px;
       margin: auto;
     }
+
     h1 {
       text-align: center;
     }
+
     .section {
       margin: 20px 0;
     }
+
     video {
       width: 100%;
       max-height: 300px;
       display: none;
     }
+
     #preview {
       margin-top: 10px;
       max-width: 100%;
       display: none;
     }
+
     .result {
       margin-top: 20px;
     }
+
     .people-section {
       margin-top: 20px;
       display: none;
     }
+
     .description-section {
       margin-top: 20px;
       display: none;
     }
   </style>
 </head>
+
 <body>
 
   <h1>GoDutch! - Split Your Receipt</h1>
 
-  <form method="post" action="/upload">
+  <form method="POST" action="/upload" enctype="multipart/form-data">
 
     <div id="step-1">
       <h3>First: submit the receipt that needs splitting</h3>
       <br>
-      
+
       <input type="file" id="upload-receipt" name="upload-receipt" accept="image/*" />
 
       <h3>-------- OR --------</h3>
@@ -67,21 +75,21 @@
     </div>
 
     <div style="display: none;" id="step-2">
-      
+
       <h3>Next: How many people are splitting the bill?</h3>
       <p>Add people to the tab and describe what they ordered. </p>
 
       <label for="num-people">Number of people:</label>
-      <input id="num-people" name="num-people" type="number" required> 
+      <input id="num-people" name="num-people" type="number" required>
       <button type="button" onclick="generatePeople()">select</button>
-      
+
       <br><br>
       <div id="people">
 
       </div>
       <br><br>
 
-      <label for="tip" >How much was the tip?</label>
+      <label for="tip">How much was the tip?</label>
       <input type="text" name="tip" required>
 
       <input type="submit" value="Start splitting!">
@@ -101,8 +109,8 @@
     const descriptionSection = document.getElementById('descriptionSection');
     const personDescriptions = document.getElementById('personDescriptions');
 
-     // JS Functions
-    
+    // JS Functions
+
     async function startCamera() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -136,7 +144,7 @@
         // Otherwise, convert it to a data URL
         const blob = await fetch(src).then(res => res.blob());
         const reader = new FileReader();
-        
+
         const base64Promise = new Promise(resolve => {
           reader.onloadend = () => resolve(reader.result);
           reader.readAsDataURL(blob);
@@ -186,7 +194,7 @@
       while (i < num) {
         console.log(i)
         let name = document.createElement("input")
-        name.name = "person-" + (i+1).toString() + "-name"
+        name.name = "person-" + (i + 1).toString() + "-name"
         name.type = "text"
         name.required = true
         name.placeholder = "person name"
@@ -194,7 +202,7 @@
         div.appendChild(name)
 
         let desc = document.createElement("input")
-        desc.name = "person-" + (i+1).toString() + "-desc"
+        desc.name = "person-" + (i + 1).toString() + "-desc"
         desc.type = "text"
         desc.required = true
         desc.placeholder = "items ordered"
@@ -210,4 +218,5 @@
 
   </script>
 </body>
+
 </html>

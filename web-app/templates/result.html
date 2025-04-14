@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GoDutch - Split Results</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   <style>
@@ -170,6 +171,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <h1>GoDutch! - Split Results</h1>
@@ -184,7 +186,7 @@
           <h3 class="person-name">{{ person.name }}</h3>
           <div class="person-total">${{ person.total }}</div>
         </div>
-        
+
         <ul class="item-list">
           {% for item in person.items %}
           <li class="item">
@@ -192,14 +194,14 @@
             <span class="item-price">${{ item.price }}</span>
           </li>
           {% endfor %}
-          
+
           {% if person.tax > 0 %}
           <li class="item">
             <span class="item-name">Tax</span>
             <span class="item-price">${{ person.tax }}</span>
           </li>
           {% endif %}
-          
+
           {% if person.tip > 0 %}
           <li class="item">
             <span class="item-name">Tip</span>
@@ -246,4 +248,5 @@
   <script>
   </script>
 </body>
+
 </html>

@@ -18,6 +18,7 @@ pytesseract = "*"
 opencv-python = "*"
 requests = "*"
 mongomock = "*"
+numpy="*"
 
 [dev-packages]
 pytest = "*"

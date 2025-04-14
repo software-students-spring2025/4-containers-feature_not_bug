@@ -8,6 +8,7 @@ and parses dish names with corresponding prices.
 import re
 import cv2
 import pytesseract
+import numpy
 from db import store_receipt_text
 from db import store_charge_per_person
 
@@ -160,13 +161,10 @@ def calculate_charge_per_person(
     return person_totals
 
 
-# img = cv2.imread(r"IMG_2437.png") # Receipt taken from camera
-# img = cv2.imread(r"test-receipt_2.jpg")  # pylint: disable=no-member
-
-
-def process_data(user_input):
+def process_data(user_input, receipt_file):
     """Reads the image sent by user, processes information, and stores data in DB"""
-    img = cv2.imread(user_input["receipt"])
+    file_bytes = numpy.asarray(bytearray(receipt_file.read()), dtype=numpy.uint8)
+    img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
 
     processed_text = pytesseract.image_to_string(process_image(img))
     processed_lines = parse_processed_lines(processed_text.splitlines())
@@ -179,3 +177,5 @@ def process_data(user_input):
 
     store_receipt_text(processed_text)
     store_charge_per_person(charge_per_person)
+
+    return charge_per_person
