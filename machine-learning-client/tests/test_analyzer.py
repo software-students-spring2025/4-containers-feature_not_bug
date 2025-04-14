@@ -258,3 +258,51 @@ def test_calculate_charge_extra_dish():
 
     for name, expected_value in expected.items():
         assert result[name] == expected_value
+
+
+def test_user_input_exact_match():
+    """Test if dish can be found with exact user dish input"""
+    user_input = {"tip": 6.0, "people": [{"name": "Alice", "items": "rainbow roll"}]}
+
+    dish_entries = [{"dish": "Rainbow Roll", "price": 10.0}]
+    charge_entries = [
+        {"dish": "Subtotal", "price": 10.0},
+        {"dish": "Tax", "price": 1.0},
+        {"dish": "Total", "price": 17.0},
+    ]
+
+    expected = {"Alice": 17.0}
+    result = calculate_charge_per_person(user_input, dish_entries, charge_entries)
+    assert result == expected
+
+
+def test_user_input_fuzzy_match():
+    """Test if dish can be found with not-exact match user dish input"""
+    user_input = {"tip": 6.0, "people": [{"name": "Alice", "items": "Rainbow Roll"}]}
+    dish_entries = [{"dish": "al Rainbow Roll", "price": 10.0}]
+    charge_entries = [
+        {"dish": "Subtotal", "price": 10.0},
+        {"dish": "Tax", "price": 1.0},
+        {"dish": "Total", "price": 17.0},
+    ]
+    expected = {"Alice": 17.0}
+    result = calculate_charge_per_person(user_input, dish_entries, charge_entries)
+    assert result == expected
+
+
+def test_user_input_no_match():
+    """Test if invalid or inexistent user dish input is correctly handled"""
+    user_input = {
+        "tip": 6.0,
+        "people": [{"name": "Alice", "items": "nonexistent dish"}],
+    }
+    dish_entries = [{"dish": "Rainbow Roll", "price": 10.0}]
+    charge_entries = [
+        {"dish": "Subtotal", "price": 10.0},
+        {"dish": "Tax", "price": 1.0},
+        {"dish": "Total", "price": 17.0},
+    ]
+
+    expected = {"Alice": 0.0}
+    result = calculate_charge_per_person(user_input, dish_entries, charge_entries)
+    assert result == expected

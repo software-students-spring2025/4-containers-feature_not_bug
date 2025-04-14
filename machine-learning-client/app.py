@@ -47,13 +47,14 @@ def app_setup():
         print("ML Client: Received receipt file with filename:", receipt_file.filename)
 
         try:
-            final = process_data(data, receipt_file)
-            print("ML Client processed data:", final)
+            result_id = process_data(data, receipt_file)
+            print("ML Client processed data:", result_id)
             return (
                 jsonify(
                     {
                         "status": "success",
                         "message": "Receipt received, processed, and stored in DB",
+                        "result_id": str(result_id),
                     }
                 ),
                 200,
