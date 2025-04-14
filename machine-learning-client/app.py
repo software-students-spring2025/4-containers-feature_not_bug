@@ -1,6 +1,6 @@
 """Flask application for Machine Learning Client API"""
 
-from flask import Flask, request  # , url_for, redirect, session
+from flask import Flask, request, jsonify  # , url_for, redirect, session
 
 from analyzer import process_data
 
@@ -22,6 +22,8 @@ def app_setup():
         Receive data from the web-app and run analysis
         """
         print("reached /submit")
+        print("ML Client: request.form contents:", request.form)
+        print("ML Client: request.files contents:", request.files)
 
         data = {"receipt": "", "tip": 0, "num-people": 0, "people": []}
 
@@ -31,7 +33,7 @@ def app_setup():
         print()
 
         # Convert data to organized form
-        data["receipt"] = request.form["receipt"]
+        # data["receipt"] = request.form["receipt"]
         data["num-people"] = request.form["num-people"]
         data["tip"] = request.form["tip"]
         for i in range(0, int(data["num-people"])):
@@ -42,13 +44,34 @@ def app_setup():
                 }
             )
 
+        if "receipt" not in request.files:
+            return jsonify({"error": "No receipt file provided"}), 400
+        receipt_file = request.files["receipt"]
+        print("ML Client: Received receipt file with filename:", receipt_file.filename)
+
         try:
-            process_data(data)
-            return "Receipt received, processed, and stored in DB", 200
+            final = process_data(data, receipt_file)
+            print("ML Client processed data:", final)
+            return (
+                jsonify(
+                    {
+                        "status": "success",
+                        "message": "Receipt received, processed, and stored in DB",
+                    }
+                ),
+                200,
+            )
 
         except Exception as e:  # pylint: disable=broad-exception-caught
+            print("Exception caught:", e)
             return (
-                e,
+                jsonify(
+                    {
+                        "status": "error",
+                        "message": "Error processing the receipt in the ML client API",
+                        "error": str(e),
+                    }
+                ),
                 500,
             )
 
