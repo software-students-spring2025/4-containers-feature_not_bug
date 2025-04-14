@@ -1,5 +1,6 @@
 """Module created to test the ML client Flask server API"""
 
+import io
 import pytest
 from app import app_setup  # Flask instance of the API
 
@@ -28,8 +29,8 @@ def test_index_contains_text(client):
     assert b"running" in response.data
 
 
-def test_correct_post(client):
-    """Try sending correct post"""
+def test_post_empty_receipt(client):
+    """Try sending incorrect post"""
 
     data = dict(
         {
@@ -49,3 +50,27 @@ def test_correct_post(client):
     response = client.post("/submit", data=data)
     assert response.status_code == 400
     assert b"receipt not provided in files" == response.data
+
+
+def test_post_dummy_receipt(client):
+    """Try sending correct post"""
+
+    data = dict(
+        {
+            "tip": "17.17",
+            "receipt": (io.BytesIO(b"some initial text data"), "filename.png"),
+            "num-people": 4,
+            "person-1-name": "jane",
+            "person-1-items": "chicken, coke",
+            "person-2-name": "joe",
+            "person-2-items": "pesto pasta",
+            "person-3-name": "john",
+            "person-3-items": "calamari, coke",
+            "person-4-name": "jack",
+            "person-4-items": "bread",
+        }
+    )
+
+    response = client.post("/submit", data=data)
+    assert response.status_code == 500
+    assert b"Error processing the receipt in the ML client API" in response.data

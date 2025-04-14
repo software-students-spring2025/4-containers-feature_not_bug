@@ -62,16 +62,7 @@ def app_setup():
 
         except Exception as e:  # pylint: disable=broad-exception-caught
             print("Exception caught:", e)
-            return (
-                jsonify(
-                    {
-                        "status": "error",
-                        "message": "Error processing the receipt in the ML client API",
-                        "error": str(e),
-                    }
-                ),
-                500,
-            )
+            return (f"Error processing the receipt in the ML client API: {str(e)}", 500)
 
     return app
 
