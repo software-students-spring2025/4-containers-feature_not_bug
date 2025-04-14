@@ -93,6 +93,7 @@ cd machine-learning-client
 pipenv run python -m pytest
 ```
 
+---
 ### How to Run this Project - With Docker
 
 You can containerize and run the entire application using Docker and Docker Compose
@@ -127,7 +128,7 @@ When you're done:
 docker-compose down
 ```
 
-
+---
 ### Additional Information
 
 - Be sure to run both servers at the same time to fully test functionality.
