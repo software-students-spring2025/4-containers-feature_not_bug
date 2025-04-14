@@ -147,9 +147,11 @@ def app_setup():  # pylint: disable=too-many-statements
         """
         result_id = session.get("result_id")
 
+        # if this endpoint is called without a proper session
         if not result_id:
             return ("No result_id found in session", 400)
 
+        # get the results data from the database
         result_data = db.receipts.find_one(
             {"_id": ObjectId(result_id), "charge_info": {"$exists": True}}
         )
@@ -157,7 +159,16 @@ def app_setup():  # pylint: disable=too-many-statements
         if not result_data:
             return ("No results found", 404)
 
-        return render_template("result.html", result_data=result_data)
+        # reformat the data
+        new_charge_info = []
+        for person in result_data["charge_info"]:
+            a = {"name": person, "total": result_data["charge_info"][person]}
+            new_charge_info.append(a)
+
+        result_data["charge_info"] = new_charge_info
+
+        # return the results HTML page
+        return render_template("result.html", data=result_data)
 
     return app
 
