@@ -46,6 +46,12 @@ MONGO_DBNAME="[database_name]"
 TESSERACT_PATH=/usr/bin/tesseract
 ```
 
+**IMPORTANT:** If you are running the Docker version of this project, add this value to the .env:
+
+```dotenv
+ML_CLIENT=ml-client
+```
+
 Populate these variables with true values specific to your cluster, following this format. 
 
 ---
