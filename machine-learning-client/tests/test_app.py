@@ -33,9 +33,9 @@ def test_correct_post(client):
 
     files = {
         "receipt": (
-            'fake',
-            'fake',
-            'fake',
+            "fake",
+            "fake",
+            "fake",
         )
     }
     data = dict(
