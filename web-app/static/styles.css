@@ -21,7 +21,7 @@
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--background);
   color: var(--dark);
   line-height: 1.6;
@@ -37,7 +37,12 @@ body {
   box-shadow: var(--box-shadow);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin-bottom: 1rem;
   font-weight: 600;
   color: var(--dark);
@@ -54,7 +59,7 @@ h1 {
 }
 
 h1::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 50%;
@@ -282,31 +287,33 @@ p[style*="color: red"] {
   body {
     padding: 10px;
   }
-  
+
   .container {
     padding: 20px;
   }
-  
+
   h1 {
     font-size: 1.8rem;
   }
-  
-  button, input[type="submit"] {
+
+  button,
+  input[type="submit"] {
     padding: 10px 15px;
   }
-  
+
   #people {
     display: flex;
     flex-direction: column;
   }
-  
+
   #people input {
     margin-bottom: 10px;
     width: 100%;
   }
 }
 
-#step-1, #step-2 {
+#step-1,
+#step-2 {
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 

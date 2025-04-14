@@ -12,11 +12,13 @@ from bson.objectid import ObjectId
 load_dotenv()
 
 
-def app_setup():
+def app_setup():  # pylint: disable=too-many-statements
     """setup the app"""
     uri = os.getenv("MONGO_URI")
-    client = MongoClient(uri, server_api=ServerApi("1"), tlsCAFile=certifi.where())
-    dbname = os.getenv("MONGO_DB", "dutch_pay")
+    client = MongoClient(  # pylint: disable=unused-variable
+        uri, server_api=ServerApi("1"), tlsCAFile=certifi.where()
+    )
+    dbname = os.getenv("MONGO_DB", "dutch_pay")  # pylint: disable=unused-variable
     app = Flask(__name__, static_folder="static")
     app.secret_key = os.getenv("SECRET_KEY", "godutch-development-key")
 
@@ -38,26 +40,33 @@ def app_setup():
         return render_template("index.html", data=data)
 
     @app.route("/upload", methods=("GET", "POST"))
-    def upload():
+    def upload():  # pylint: disable=too-many-return-statements
         """
         Handle form submission when receipt is uploaded
         """
 
         data = []
-        print(request.form)
+        # Debugging
+        print("Received form data:", request.form)
+        print("Received files:", request.files)
 
         if (
-            "capture-receipt" not in request.form
-            and "upload-receipt" not in request.form
+            "capture-receipt" not in request.files
+            and "upload-receipt" not in request.files
         ):
-            return "Receipt image not found", 400
+            return "Receipt image not found 1", 400
 
-        if "capture-receipt" in request.form and request.form["capture-receipt"] != "":
-            data.append(("receipt", request.form["capture-receipt"]))
-        elif "upload-receipt" in request.form and request.form["upload-receipt"] != "":
-            data.append(("receipt", request.form["upload-receipt"]))
+        if (
+            "capture-receipt" in request.files
+            and request.files["capture-receipt"] != ""
+        ):
+            receipt_file = request.files["capture-receipt"]
+        elif (
+            "upload-receipt" in request.files and request.files["upload-receipt"] != ""
+        ):
+            receipt_file = request.files["upload-receipt"]
         else:
-            return "Receipt image not found", 400
+            return "Receipt image not found 2", 400
 
         num = int(request.form["num-people"])
         if (
@@ -92,10 +101,27 @@ def app_setup():
                     request.form["person-" + str(i + 1) + "-desc"],
                 )
             )
+
+        # Debugging
+        print("Payload data being sent to ML client:", data)
+        print("Receipt file name:", receipt_file.filename)
+
+        files = {
+            "receipt": (
+                receipt_file.filename,
+                receipt_file.stream,
+                receipt_file.mimetype,
+            )
+        }
+
         try:
-            res = requests.post("http://127.0.0.1:5000/submit", data=data, timeout=60)
+            res = requests.post(
+                "http://127.0.0.1:5000/submit", data=data, files=files, timeout=60
+            )
             if res.status_code == 200:
-                print("received successful response from ML client")
+                # print("received successful response from ML client")
+                print("Response status code from ML client:", res.status_code)
+                print("Response text from ML client:", res.text)
                 # Store the result ID in session
                 result_data = res.json()
                 session["result_id"] = result_data.get("result_id")
