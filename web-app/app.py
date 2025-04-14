@@ -119,9 +119,9 @@ def app_setup():  # pylint: disable=too-many-statements
         try:
             host = os.getenv("ML_CLIENT")
             if host is None:
-                host = '127.0.0.1'
+                host = "127.0.0.1"
             res = requests.post(
-                "http://"+host+":4999/submit", data=data, files=files, timeout=60
+                "http://" + host + ":4999/submit", data=data, files=files, timeout=60
             )
             if res.status_code == 200:
                 # print("received successful response from ML client")
