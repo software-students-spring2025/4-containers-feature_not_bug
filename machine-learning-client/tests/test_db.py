@@ -3,8 +3,7 @@
 import mongomock
 import pytest
 
-from db import store_receipt_text
-from db import store_charge_per_person
+from db import store_receipt_info
 
 shared_client = mongomock.MongoClient()
 shared_db = shared_client["test_dutch_pay"]
@@ -21,45 +20,31 @@ def patch_get_db(monkeypatch):
     monkeypatch.setattr("db.get_db", get_test_db)
 
 
-def test_store_receipt_text():
-    """Test storing the raw receipt text into DB"""
-    sample_receipt_text = "BigMac 5.0\nLarge Coke 3.0\nChicken McNuggets 5.0\nSub-total   13.0\nTAX   2.0\nTotal   15.0"  # pylint: disable=line-too-long
+def test_store_receipt_info_success():
+    """Test that store_receipt_data inserts a document with both fields"""
+    sample_receipt_text = "BigMac 5.0\nLarge Coke 3.0\nReceipt details..."
+    sample_charge_info = {"Alice": 10.77, "Bob": 11.44, "Charlie": 10.77}
 
-    inserted_id = store_receipt_text(sample_receipt_text)
+    inserted_id = store_receipt_info(sample_receipt_text, sample_charge_info)
     assert inserted_id is not None
 
     stored_doc = shared_db.receipts.find_one({"_id": inserted_id})
     assert stored_doc is not None
-    assert stored_doc["receipt_text"] == sample_receipt_text
+
+    assert stored_doc.get("receipt_text") == sample_receipt_text
+    assert stored_doc.get("charge_info") == sample_charge_info
 
 
-def test_store_charge_per_person_data_type():
-    """Test that inserted document contains a dictionary under the 'charge_info' field"""
-    sample_charge_info = {"Alice": 10.77, "Bob": 11.44, "Charlie": 10.77}
-    inserted_id = store_charge_per_person(sample_charge_info)
-    stored_doc = shared_db.receipts.find_one({"_id": inserted_id})
-    assert isinstance(stored_doc["charge_info"], dict)
-
-
-def test_store_charge_per_person_normal():
-    """Test storing the charge per person in DB"""
-    sample_charge_info = {"Alice": 10.77, "Bob": 11.44, "Charlie": 10.77}
-
-    inserted_id = store_charge_per_person(sample_charge_info)
-    assert inserted_id is not None
-
-    stored_doc = shared_db.receipts.find_one({"_id": inserted_id})
-    assert stored_doc is not None
-    assert stored_doc["charge_info"] == sample_charge_info
-
-
-def test_store_charge_per_person_empty():
-    """Test that storing an empty charge per person in DB is correctly handled"""
+def test_store_receipt_data_empty_values():
+    """Test that storing with empty values still creates the proper document"""
+    sample_receipt_text = ""
     sample_charge_info = {}
 
-    inserted_id = store_charge_per_person(sample_charge_info)
+    inserted_id = store_receipt_info(sample_receipt_text, sample_charge_info)
     assert inserted_id is not None
 
     stored_doc = shared_db.receipts.find_one({"_id": inserted_id})
     assert stored_doc is not None
-    assert stored_doc["charge_info"] == sample_charge_info
+
+    assert stored_doc.get("receipt_text") == sample_receipt_text
+    assert stored_doc.get("charge_info") == sample_charge_info

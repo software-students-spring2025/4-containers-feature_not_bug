@@ -18,17 +18,13 @@ def get_db():
     return client[db_name]
 
 
-def store_receipt_text(receipt_text):
-    """Store raw receipt text in DB"""
+def store_receipt_info(receipt_text, charge_per_person):
+    """Store raw receipt text and charge per person info in DB"""
     db = get_db()
 
-    result = db.receipts.insert_one({"receipt_text": receipt_text})
-    return result.inserted_id
-
-
-def store_charge_per_person(charge_per_person):
-    """Store charge per person info in DB"""
-    db = get_db()
-
-    result = db.receipts.insert_one({"charge_info": charge_per_person})
+    receipt_info = {
+        "receipt_text": receipt_text,
+        "charge_info": charge_per_person,
+    }
+    result = db.receipts.insert_one(receipt_info)
     return result.inserted_id
