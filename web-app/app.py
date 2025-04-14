@@ -3,14 +3,11 @@
 import os
 import certifi
 from flask import Flask, render_template, request, session, redirect, url_for
-
-# import pymongo
-# from bson.objectid import ObjectId
-# import database, filter
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from dotenv import load_dotenv
 import requests
+from bson.objectid import ObjectId
 
 load_dotenv()
 
@@ -26,6 +23,9 @@ def app_setup():  # pylint: disable=too-many-statements
     app.secret_key = os.getenv("SECRET_KEY", "godutch-development-key")
 
     os.makedirs(os.path.join(app.static_folder, "uploads"), exist_ok=True)
+
+    # Get DB connection
+    db = client[dbname]
 
     @app.route("/", methods=("GET", "POST"))
     def show_dashboard():
@@ -116,7 +116,7 @@ def app_setup():  # pylint: disable=too-many-statements
 
         try:
             res = requests.post(
-                "http://127.0.0.1:4999/submit", data=data, files=files, timeout=60
+                "http://127.0.0.1:5000/submit", data=data, files=files, timeout=60
             )
             if res.status_code == 200:
                 # print("received successful response from ML client")
@@ -146,19 +146,15 @@ def app_setup():  # pylint: disable=too-many-statements
         Display results of data analysis
         """
         result_id = session.get("result_id")
-        result_data = None
 
-        if result_id:
-            try:
-                res = requests.get(
-                    f"http://127.0.0.1:4999/results/{result_id}", timeout=10
-                )
-                if res.status_code == 200:
-                    result_data = res.json()
-                else:
-                    print(f"Error fetching results: {res.text}")
-            except requests.RequestException as req_error:
-                print(f"Error connecting to ML client: {str(req_error)}")
+        if not result_id:
+            return ("No result_id found in session", 400)
+
+        result_data = db.receipts.find_one(
+            {"_id": ObjectId(result_id), "charge_info": {"$exists": True}}
+        )
+        if not result_data:
+            return ("No results found", 404)
 
         return render_template("result.html", result_data=result_data)
 

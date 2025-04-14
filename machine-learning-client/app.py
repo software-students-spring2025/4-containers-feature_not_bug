@@ -28,9 +28,6 @@ def app_setup():
         data = {"receipt": "", "tip": 0, "num-people": 0, "people": []}
 
         # receive data from the POST request
-        print(request.form)
-        print(request.headers)
-        print()
 
         # Convert data to organized form
         # data["receipt"] = request.form["receipt"]
