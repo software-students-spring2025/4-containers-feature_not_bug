@@ -10,8 +10,7 @@ import difflib
 import cv2
 import pytesseract
 import numpy
-from db import store_receipt_text
-from db import store_charge_per_person
+from db import store_receipt_info
 
 
 def process_image(raw_img):
@@ -118,6 +117,9 @@ def calculate_charge_per_person(
     subtotal_from_receipt = charges_dict.get("subtotal")
     tax_from_receipt = charges_dict.get("tax")
 
+    print(subtotal_from_receipt)
+    print(tax_from_receipt)
+
     # Extract tip from user input
     tip = user_input.get("tip", 0.0)
 
@@ -181,7 +183,6 @@ def process_data(user_input, receipt_file):
     )
     print(charge_per_person)
 
-    store_receipt_text(processed_text)
-    charge_id = store_charge_per_person(charge_per_person)
+    charge_id = store_receipt_info(processed_text, charge_per_person)
 
     return charge_id
