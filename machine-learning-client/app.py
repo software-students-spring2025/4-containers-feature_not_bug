@@ -54,7 +54,7 @@ def app_setup():
                     {
                         "status": "success",
                         "message": "Receipt received, processed, and stored in DB",
-                        "result_id": str(result_id)
+                        "result_id": str(result_id),
                     }
                 ),
                 200,
