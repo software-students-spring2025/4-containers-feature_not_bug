@@ -31,13 +31,6 @@ def test_index_contains_text(client):
 def test_correct_post(client):
     """Try sending correct post"""
 
-    files = {
-        "receipt": (
-            "fake",
-            "fake",
-            "fake",
-        )
-    }
     data = dict(
         {
             "tip": "17.17",
