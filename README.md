@@ -15,7 +15,6 @@ GoDutch is an innovative app that allows users to seamlessly split restaurant bi
   - [How to Run this Project - With Docker](#how-to-run-this-project---with-docker)
     - [Prerequisites](#prerequisites-1)
     - [Running the App with Docker](#running-the-app-with-docker)
-    - [Environment Variables](#environment-variables)
   - [Additional Information](#additional-information)
 
 ## Team Members
@@ -35,6 +34,19 @@ Before you begin, ensure you have the following installed on your system:
 - **Git** (for version control) - [Install Git](https://git-scm.com/)
 - **Tesseract** (To run the machine learning client)
   - Install with `sudo apt-get install -y tesseract-ocr`
+
+
+Additionally, create a .env file inside BOTH the web-app directory and the machine-learning-client directory. Here is an example:
+
+```dotenv
+MONGO_URI=mongodb+srv://[username]:[password]@[cluster].mongodb.net/dbname
+MONGO_DBNAME="[database_name]" 
+
+# ML Client Configuration
+TESSERACT_PATH=/usr/bin/tesseract
+```
+
+Populate these variables with true values specific to your cluster, following this format. 
 
 ---
 ### How to Run this Project - No Docker
@@ -63,14 +75,6 @@ pipenv run python app.py
 ```
 This starts the frontend server on http://localhost:5000.
 
-4. Create a .env file inside the web-app directory (and machine-learning-client if needed). Here is an example:
-
-```dotenv
-MONGO_URI=mongodb+srv://[username]:[password]@[cluster].mongodb.net/dbname
-MONGO_DBNAME="[database_name]" 
-```
-
-Populate these variables with true values specific to your cluster, following this format. 
 
 #### Running Tests
 To ensure everything is working as expected, you can run the pytests for both parts of the application.
@@ -79,14 +83,14 @@ To ensure everything is working as expected, you can run the pytests for both pa
 
 ```bash
 cd web-app
-pipenv run pytest
+pipenv run python -m pytest
 ```
 
 **Machine Learning Client Tests**
 
 ``` bash
 cd machine-learning-client
-pipenv run pytest
+pipenv run python -m pytest
 ```
 
 ### How to Run this Project - With Docker
@@ -114,14 +118,6 @@ This will:
   - web-app: http://localhost:5000
   - ml-client: http://localhost:4999
  
-#### Environment Variables
-
-Create a .env file in the root directory (or as needed in each service folder):
-
-``` dotenv
-MONGO_URI=mongodb+srv://[username]:[password]@[cluster].mongodb.net/[dbname]
-MONGO_DBNAME="[database_name]"
-```
 
 **Stopping the containers**
 
