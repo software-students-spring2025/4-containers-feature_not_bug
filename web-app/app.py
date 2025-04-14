@@ -162,8 +162,7 @@ def app_setup():  # pylint: disable=too-many-statements
         # reformat the data
         new_charge_info = []
         for person in result_data["charge_info"]:
-            a = {"name": person.key(), "total": person.value()}
-            print(a)
+            a = {"name": person, "total": result_data["charge_info"][person]}
             new_charge_info.append(a)
 
         result_data["charge_info"] = new_charge_info
