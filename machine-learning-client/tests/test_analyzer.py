@@ -6,6 +6,7 @@ from analyzer import parse_processed_lines
 from analyzer import filter_dishes
 from analyzer import normalize_dictionary_list
 from analyzer import calculate_charge_per_person
+from analyzer import normalize_text
 
 
 def test_sanitize_string_normal():
@@ -130,7 +131,7 @@ def test_normalize_whitespace_and_case():
     assert normalize_dictionary_list(dictionary_list) == {
         "chicken over rice": 7.0,
         "lamb kebab": 5.0,
-        "coca-cola": 2.0,
+        "cocacola": 2.0,
     }
 
 
@@ -306,3 +307,34 @@ def test_user_input_no_match():
     expected = {"Alice": 0.0}
     result = calculate_charge_per_person(user_input, dish_entries, charge_entries)
     assert result == expected
+
+
+def test_normalize_simple():
+    """Test that a simple dish name normalizes correctly"""
+    assert normalize_text("Rainbow Roll") == "rainbow roll"
+
+
+def test_normalize_with_dash():
+    """Test that a dish name with a dash is normalized correctly"""
+    assert normalize_text("Rainbow-Roll") == "rainbowroll"
+
+
+def test_normalize_with_comma():
+    """Test that a dish name with a comma is normalized correctly"""
+    assert normalize_text("Rainbow, Roll") == "rainbow roll"
+
+
+def test_normalize_with_colon():
+    """Test that a dish name with a colon is normalized correctly"""
+    assert normalize_text("Rainbow Roll:") == "rainbow roll"
+
+
+def test_normalize_extra_spaces():
+    """Test that extra spaces get collapsed and trimmed"""
+    # "   Rainbow    Roll   " should also become "rainbow roll"
+    assert normalize_text("   Rainbow    Roll   ") == "rainbow roll"
+
+
+def test_normalize_empty_string():
+    """Test that an empty string remains empty"""
+    assert normalize_text("") == ""
