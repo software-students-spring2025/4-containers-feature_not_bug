@@ -183,8 +183,8 @@
       {% for person in data["charge_info"] %}
       <div class="person-card">
         <div class="person-header">
-          <h3 class="person-name">{{ person }}</h3>
-          <div class="person-total">${{ person.value }}</div>
+          <h3 class="person-name">{{ person["name"] }}</h3>
+          <div class="person-total">${{ person["total"] }}</div>
         </div>
         
       </div>

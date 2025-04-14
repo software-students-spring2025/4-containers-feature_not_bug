@@ -159,6 +159,15 @@ def app_setup():  # pylint: disable=too-many-statements
         if not result_data:
             return ("No results found", 404)
 
+        # reformat the data
+        new_charge_info = []
+        for person in result_data["charge_info"]:
+            a = {"name": person.key(), "total": person.value()}
+            print(a)
+            new_charge_info.append(a)
+
+        result_data["charge_info"] = new_charge_info
+
         # return the results HTML page
         return render_template("result.html", data=result_data)
 
