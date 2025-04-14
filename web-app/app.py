@@ -116,7 +116,7 @@ def app_setup():  # pylint: disable=too-many-statements
 
         try:
             res = requests.post(
-                "http://127.0.0.1:5000/submit", data=data, files=files, timeout=60
+                "http://127.0.0.1:4999/submit", data=data, files=files, timeout=60
             )
             if res.status_code == 200:
                 # print("received successful response from ML client")
@@ -153,6 +153,7 @@ def app_setup():  # pylint: disable=too-many-statements
         result_data = db.receipts.find_one(
             {"_id": ObjectId(result_id), "charge_info": {"$exists": True}}
         )
+        print(result_data)
         if not result_data:
             return ("No results found", 404)
 

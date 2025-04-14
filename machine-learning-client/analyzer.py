@@ -6,6 +6,7 @@ and parses dish names with corresponding prices.
 # pylint: disable=no-member
 
 import re
+import difflib
 import cv2
 import pytesseract
 import numpy
@@ -141,11 +142,15 @@ def calculate_charge_per_person(
 
     # For each dish that people ordered, add its cost share to each person who had the dish
     for dish, consumers in dish_consumers.items():
-        if dish in dish_prices:
-            price = dish_prices[dish]
+        matches = difflib.get_close_matches(dish, dish_prices.keys(), n=1, cutoff=0.6)
+        if matches:
+            matched_key = matches[0]
+            price = dish_prices[matched_key]
             split_price = price / len(consumers)
             for name in consumers:
                 person_totals[name] += split_price
+        else:
+            print(f"No close match found for: {dish}")
 
     # Calculate each person's share of the tip and tax proportionally
     for name in person_totals:
@@ -174,8 +179,9 @@ def process_data(user_input, receipt_file):
     charge_per_person = calculate_charge_per_person(
         user_input, filtered_dishes, other_charges
     )
+    print(charge_per_person)
 
     store_receipt_text(processed_text)
-    store_charge_per_person(charge_per_person)
+    charge_id = store_charge_per_person(charge_per_person)
 
-    return charge_per_person
+    return charge_id
