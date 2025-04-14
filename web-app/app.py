@@ -93,7 +93,7 @@ def app_setup():
                 )
             )
         try:
-            res = requests.post("http://127.0.0.1:4999/submit", data=data, timeout=60)
+            res = requests.post("http://127.0.0.1:5000/submit", data=data, timeout=60)
             if res.status_code == 200:
                 print("received successful response from ML client")
                 # Store the result ID in session
